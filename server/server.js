@@ -37,7 +37,3 @@ io.sockets.on("disconnect", socket => {
 function updateGame() {
   io.sockets.emit("heartbeat", players);
 }
-
-
-
-
