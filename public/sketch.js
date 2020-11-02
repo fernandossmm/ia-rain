@@ -36,3 +36,9 @@ function playerExists(playerFromServer) {
 function removePlayer(playerId) {
   players = players.filter(player => player.id !== playerId);
 }
+
+document.addEventListener('click', function(event){
+  console.log("event sent");
+  socket.emit('myClick',10);
+ });
+ 
