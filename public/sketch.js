@@ -39,6 +39,9 @@ function removePlayer(playerId) {
 
 document.addEventListener('click', function(event){
   console.log("event sent");
-  socket.emit('myClick',10);
+  var target = event.target;
+  var myClick = {id: target, event: event};
+ console.log(myClick);
+  socket.emit('myClick',myClick);
  });
  
