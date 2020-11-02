@@ -1,10 +1,15 @@
 const socket = io.connect('http://localhost');
 
 let players = [];
+var song = null;
+
 
 socket.on("heartbeat", players => updatePlayers(players));
 socket.on("disconnect", playerId => removePlayer(playerId));
 
+function preload() {
+  song = loadSound('Bam.mp3');
+}
 
 function setup() {
   createCanvas(400, 400);
@@ -37,11 +42,10 @@ function removePlayer(playerId) {
   players = players.filter(player => player.id !== playerId);
 }
 
-document.addEventListener('click', function(event){
-  console.log("event sent");
-  var target = event.target;
-  var myClick = {id: target, event: event};
- console.log(myClick);
+function mouseClicked(){
+  song.play();
+  var myClick = {x: mouseX, y: mouseY};
+  console.log(myClick);
   socket.emit('myClick',myClick);
- });
+ };
  
