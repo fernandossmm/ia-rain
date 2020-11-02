@@ -19,6 +19,7 @@ io.sockets.on("connection", socket => {
   players.push(new Player(socket.id));
   
   socket.on('myClick', function (data) {
+    io.sockets.emit("click",data);
     console.log(data);
 });
 

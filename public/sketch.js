@@ -2,10 +2,13 @@ const socket = io.connect('http://localhost');
 
 let players = [];
 var song = null;
+var x = 0;
+var y = 0;
 
 
 socket.on("heartbeat", players => updatePlayers(players));
 socket.on("disconnect", playerId => removePlayer(playerId));
+socket.on("click", data => {x = data.x; y = data.y});
 
 function preload() {
   song = loadSound('Bam.mp3');
@@ -18,6 +21,7 @@ function setup() {
 function draw() {
   background(220);
   players.forEach(player => player.draw());
+  circle(x,y,30);
 }
 
 function updatePlayers(serverPlayers) {
@@ -45,6 +49,8 @@ function removePlayer(playerId) {
 function mouseClicked(){
   song.play();
   var myClick = {x: mouseX, y: mouseY};
+  x = mouseX;
+  y= mouseY;
   console.log(myClick);
   socket.emit('myClick',myClick);
  };
