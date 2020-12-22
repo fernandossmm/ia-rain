@@ -11,8 +11,13 @@
 
 </head>
 <body>
-<script src="sketch.js"></script>
-<script src="Player.js"></script>
-<!--<canvas id="container" width="800" height="600"></canvas>-->
+  <video class="videobg" src="media/video.mp4" poster="media/video.jpg" autoplay loop muted>
+		<source src="media/video.webm" type="video/web">
+		<source src="media/video.mp4" type="video/mp4">
+	</video>
+  <script src="sketch.js"></script>
+  <script src="Player.js"></script>
+  <canvas id="container" width="1" height="1" style="position:absolute"></canvas>
+  <script type="module" src="src/index3.js"></script>
 </body>
 </html>
