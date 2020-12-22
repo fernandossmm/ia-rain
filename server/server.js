@@ -7,7 +7,6 @@ let server = app.listen(80);
 console.log('The server is now running at http://localhost/');
 app.use(express.static("public"));
 
-
 let io = socket(server);
 
 let players = [];
@@ -19,16 +18,20 @@ io.sockets.on("connection", socket => {
   players.push(new Player(socket.id));
   
   socket.on('myClick', function (data) {
+      io.sockets.emit("click",data);
+      console.log(data);
+  });
+
+  socket.on('myPosition', function (data) {
     io.sockets.emit("click",data);
     console.log(data);
 });
 
   socket.on("disconnect", () => {
-    io.sockets.emit("disconnect", socket.id);
-    players = players.filter(player => player.id !== socket.id);
+      io.sockets.emit("disconnect", socket.id);
+      players = players.filter(player => player.id !== socket.id);
   });
 });
-
 
 io.sockets.on("disconnect", socket => {
   io.sockets.emit("disconnect", socket.id);

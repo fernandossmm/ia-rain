@@ -15,7 +15,7 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(400, 400);
+  createCanvas(screen.width, screen.height-screen.height*0.17);
 }
 
 function draw() {
@@ -49,9 +49,12 @@ function removePlayer(playerId) {
 function mouseClicked(){
   song.play();
   var myClick = {x: mouseX, y: mouseY};
-  x = mouseX;
-  y= mouseY;
-  console.log(myClick);
+  //x = mouseX;
+  //y= mouseY;
   socket.emit('myClick',myClick);
  };
  
+function mouseMoved() {
+  var position = {x: mouseX, y: mouseY};
+  socket.emit('myPosition',position);
+}
