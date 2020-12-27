@@ -62,7 +62,6 @@ function mouseMoved() {
 ////////////////////////////////////////
 ////////// SONIDO //////////////////////
 ////////////////////////////////////////
-//window.addEventListener('keydown', init);
 window.addEventListener('click', init);
 
 function init() {
@@ -74,14 +73,9 @@ function init() {
   const audioElement = document.querySelector('audio');
   const track = audioCtx.createMediaElementSource(audioElement);
 
-  // create Oscillator and gain node
-//  var oscillator = audioCtx.createOscillator();
+  // create biquadFilter and gain node
   const biquadFilter = audioCtx.createBiquadFilter();  
   const gainNode = audioCtx.createGain();
-
-  // connect oscillator to gain node to speakers
-//  oscillator.connect(gainNode);
-//  gainNode.connect(audioCtx.destination);
 
   // connect our graph
   track.connect(biquadFilter);
@@ -93,24 +87,13 @@ function init() {
   var HEIGHT = window.innerHeight;
 
   var maxFreq = 6000;
-  var maxVol = 0.2;
-
-  var initialVol = 0.001;
-
-  // set options for the oscillator
-//  oscillator.detune.value = 100; // value in cents
-//  oscillator.start(0);
-
-  gainNode.gain.value = initialVol;
-  gainNode.gain.minValue = initialVol;
-  gainNode.gain.maxValue = initialVol;
+  var maxVol = 2;
 
   // Mouse pointer coordinates
-  var CurX;
-  var CurY;
+  var CurX, CurY;
 
   // Get new mouse pointer coordinates when mouse is moved
-  // then set new gain and pitch values
+  // then set new gain and frequency values
   document.onmousemove = updatePage;
 
   function updatePage(e) {
