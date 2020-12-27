@@ -62,7 +62,7 @@ function mouseMoved() {
 ////////////////////////////////////////
 ////////// SONIDO //////////////////////
 ////////////////////////////////////////
-window.addEventListener('keydown', init);
+//window.addEventListener('keydown', init);
 window.addEventListener('click', init);
 
 function init() {
@@ -70,26 +70,34 @@ function init() {
   var AudioContext = window.AudioContext || window.webkitAudioContext;
   var audioCtx = new AudioContext();
 
+  // load some sound
+  const audioElement = document.querySelector('audio');
+  const track = audioCtx.createMediaElementSource(audioElement);
+
   // create Oscillator and gain node
-  var oscillator = audioCtx.createOscillator();
-  var gainNode = audioCtx.createGain();
+//  var oscillator = audioCtx.createOscillator();
+  const gainNode = audioCtx.createGain();
 
   // connect oscillator to gain node to speakers
-  oscillator.connect(gainNode);
+// oscillator.connect(gainNode);
+//  gainNode.connect(audioCtx.destination);
+
+  // connect our graph
+  track.connect(gainNode);
   gainNode.connect(audioCtx.destination);
 
   // create initial frequency and volumn values
   var WIDTH = window.innerWidth;
-  var HEIGHT = window.innerHeight;
+//  var HEIGHT = window.innerHeight;
 
-  var maxFreq = 6000;
+//  var maxFreq = 6000;
   var maxVol = 0.02;
 
   var initialVol = 0.001;
 
   // set options for the oscillator
-  oscillator.detune.value = 100; // value in cents
-  oscillator.start(0);
+//  oscillator.detune.value = 100; // value in cents
+//  oscillator.start(0);
 
   gainNode.gain.value = initialVol;
   gainNode.gain.minValue = initialVol;
@@ -97,19 +105,19 @@ function init() {
 
   // Mouse pointer coordinates
   var CurX;
-  var CurY;
+//  var CurY;
 
   // Get new mouse pointer coordinates when mouse is moved
   // then set new gain and pitch values
   document.onmousemove = updatePage;
 
   function updatePage(e) {
-      KeyFlag = false;
-
       CurX = (window.Event) ? e.pageX : event.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
-      CurY = (window.Event) ? e.pageY : event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
+//      CurY = (window.Event) ? e.pageY : event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
 
       gainNode.gain.value = (CurX/WIDTH) * maxVol;
-      oscillator.frequency.value = (CurY/HEIGHT) * maxFreq;
+//      oscillator.frequency.value = (CurY/HEIGHT) * maxFreq;
+
+      audioElement.play();
   }
 }
