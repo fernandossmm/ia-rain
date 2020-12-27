@@ -76,22 +76,24 @@ function init() {
 
   // create Oscillator and gain node
 //  var oscillator = audioCtx.createOscillator();
+  const biquadFilter = audioCtx.createBiquadFilter();  
   const gainNode = audioCtx.createGain();
 
   // connect oscillator to gain node to speakers
-// oscillator.connect(gainNode);
+//  oscillator.connect(gainNode);
 //  gainNode.connect(audioCtx.destination);
 
   // connect our graph
-  track.connect(gainNode);
+  track.connect(biquadFilter);
+  biquadFilter.connect(gainNode);
   gainNode.connect(audioCtx.destination);
 
   // create initial frequency and volumn values
   var WIDTH = window.innerWidth;
-//  var HEIGHT = window.innerHeight;
+  var HEIGHT = window.innerHeight;
 
-//  var maxFreq = 6000;
-  var maxVol = 0.02;
+  var maxFreq = 6000;
+  var maxVol = 0.2;
 
   var initialVol = 0.001;
 
@@ -105,7 +107,7 @@ function init() {
 
   // Mouse pointer coordinates
   var CurX;
-//  var CurY;
+  var CurY;
 
   // Get new mouse pointer coordinates when mouse is moved
   // then set new gain and pitch values
@@ -113,10 +115,10 @@ function init() {
 
   function updatePage(e) {
       CurX = (window.Event) ? e.pageX : event.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
-//      CurY = (window.Event) ? e.pageY : event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
+      CurY = (window.Event) ? e.pageY : event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
 
       gainNode.gain.value = (CurX/WIDTH) * maxVol;
-//      oscillator.frequency.value = (CurY/HEIGHT) * maxFreq;
+      biquadFilter.frequency.value = (CurY/HEIGHT) * maxFreq;
 
       audioElement.play();
   }
