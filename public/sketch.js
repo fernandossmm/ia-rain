@@ -57,10 +57,10 @@ function mouseClicked(){
   socket.emit('myClick',myClick);
  };
  
-function mouseMoved() { // No creo que vayamos a necesitar esto
-  var position = {x: mouseX, y: mouseY};
-  socket.emit('myPosition',position);
-}
+//function mouseMoved() { // No creo que vayamos a necesitar esto
+  //var position = {x: mouseX, y: mouseY};
+  //socket.emit('myPosition',position);
+//}
 
 ////////////////////////////////////////
 ////////// SONIDO //////////////////////
@@ -97,15 +97,19 @@ function init() {
 
   // Get new mouse pointer coordinates when mouse is moved
   // then set new gain and frequency values
+  
   document.onmousemove = updatePage;
 
+
   function updatePage(e) {
-      CurX = (window.Event) ? e.pageX : event.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
-      CurY = (window.Event) ? e.pageY : event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
+    if(mouseIsPressed){
+      CurX = (window.Event) ? e.pageX : Event.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
+      CurY = (window.Event) ? e.pageY : Event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
 
       gainNode.gain.value = (CurX/WIDTH) * maxVol;
       biquadFilter.frequency.value = (CurY/HEIGHT) * maxFreq;
 
       audioElement.play();
+    }
   }
 }
