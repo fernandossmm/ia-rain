@@ -50,7 +50,7 @@ function removePlayer(playerId) {
 }
 
 function mouseClicked(){
-  song.play();
+ // song.play();
   var myClick = {x: mouseX, y: mouseY};
   //x = mouseX;
   //y= mouseY;
@@ -107,7 +107,7 @@ function init() {
       gainNode.gain.value = (CurX/WIDTH) * maxVol;
       biquadFilter.frequency.value = (CurY/HEIGHT) * maxFreq;
 
-      audioElement.play();
+     // audioElement.play();
     }
   }
 }
