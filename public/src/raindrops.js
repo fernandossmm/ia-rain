@@ -20,18 +20,20 @@ const Drop={
   shrink:0,
 }
 const defaultOptions={
-  minR:10,
-  maxR:40,
+  minR:30,
+  maxR:60,
+  randomDropsRMultiplier:0.3,
   maxDrops:900,
   rainChance:0.3,
   rainLimit:3,
-  dropletsRate:50,
+  dropletsRate:5,
   dropletsSize:[2,4],
   dropletsCleaningRadiusMultiplier:0.43,
   raining:true,
   globalTimeScale:1,
   trailRate:1,
   autoShrink:true,
+  autoShrinkRate: 0.01,
   spawnArea:[-0.1,0.95],
   trailScaleRange:[0.2,0.5],
   collisionRadius:0.65,
@@ -194,9 +196,27 @@ Raindrops.prototype={
     if(this.options.raining){
       let limit=this.options.rainLimit*timeScale*this.areaMultiplier;
       let count=0;
-      while(chance(this.options.rainChance*timeScale*this.areaMultiplier) && count<limit){
+      if(mouseIsPressed){  // Drop where mouse pressed
         count++;
         let r=random(this.options.minR,this.options.maxR,(n)=>{
+          return Math.pow(n,3);
+        });
+        let rainDrop=this.createDrop({
+          x:mouseX,
+          y:mouseY,
+          r:r,
+          momentum:1+((r-this.options.minR)*0.1)+random(2),
+          spreadX:1.5,
+          spreadY:1.5,
+        });
+        if(rainDrop!=null){
+          rainDrops.push(rainDrop);
+        }
+      }
+      while(chance(this.options.rainChance*timeScale*this.areaMultiplier) && count<limit){  // Random rain drops
+        count++;
+        let r=random(this.options.minR*this.options.randomDropsRMultiplier,
+                     this.options.maxR*this.options.randomDropsRMultiplier,(n)=>{
           return Math.pow(n,3);
         });
         let rainDrop=this.createDrop({
@@ -270,7 +290,7 @@ Raindrops.prototype={
         }
         // clean small drops
         if(this.options.autoShrink && drop.r<=this.options.minR && chance(0.05*timeScale)){
-          drop.shrink+=0.01;
+          drop.shrink+=this.options.autoShrinkRate;
         }
         //update shrinkage
         drop.r -= drop.shrink*timeScale;
