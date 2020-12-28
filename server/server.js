@@ -11,6 +11,8 @@ let io = socket(server);
 
 let players = [];
 
+let sounds = [];
+
 setInterval(updateGame, 16);
 
 io.sockets.on("connection", socket => {
@@ -19,13 +21,12 @@ io.sockets.on("connection", socket => {
   
   socket.on('myClick', function (data) {
       io.sockets.emit("click",data);
-      console.log(data);
+      players.forEach(player => {
+        player.addSound(data);
+        console.log(player.id+":");
+        console.log(player.sounds);
+      });
   });
-
-  socket.on('myPosition', function (data) {
-    io.sockets.emit("click",data);
-    console.log(data);
-});
 
   socket.on("disconnect", () => {
       io.sockets.emit("disconnect", socket.id);

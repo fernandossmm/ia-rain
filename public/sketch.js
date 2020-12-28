@@ -22,9 +22,9 @@ function setup() {
 function draw() {
   background(220,220,220,0);
   
-  circle(500,200,200);
+  //circle(500,200,200);
   
-  players.forEach(player => player.draw());
+  //players.forEach(player => player.draw());
 }
 
 function updatePlayers(serverPlayers) {
@@ -56,11 +56,6 @@ function mouseClicked(){
   //y= mouseY;
   socket.emit('myClick',myClick);
  };
- 
-//function mouseMoved() { // No creo que vayamos a necesitar esto
-  //var position = {x: mouseX, y: mouseY};
-  //socket.emit('myPosition',position);
-//}
 
 ////////////////////////////////////////
 ////////// SONIDO //////////////////////
@@ -105,6 +100,9 @@ function init() {
     if(mouseIsPressed){
       CurX = (window.Event) ? e.pageX : Event.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
       CurY = (window.Event) ? e.pageY : Event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
+
+      var myClick = {x: mouseX, y: mouseY};
+      socket.emit('myClick',myClick);
 
       gainNode.gain.value = (CurX/WIDTH) * maxVol;
       biquadFilter.frequency.value = (CurY/HEIGHT) * maxFreq;
