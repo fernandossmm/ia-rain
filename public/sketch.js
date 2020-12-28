@@ -1,17 +1,18 @@
+p5.disableFriendlyErrors = true;
+
 const socket = io.connect('http://localhost');
 
 let players = [];
 var song = null;
 var x = 0;
 var y = 0;
-
+var mouseIsPressed;
 
 socket.on("heartbeat", players => updatePlayers(players));
 socket.on("disconnect", playerId => removePlayer(playerId));
-socket.on("click", data => {x = data.x; y = data.y});
 
 function preload() {
-  song = loadSound('Bam.mp3');
+  song = loadSound('media/Bam.mp3');
 }
 
 function setup() {
@@ -20,6 +21,7 @@ function setup() {
 
 function draw() {
   background(220);
+  
   players.forEach(player => player.draw());
   circle(x,y,30);
 }
@@ -54,7 +56,7 @@ function mouseClicked(){
   socket.emit('myClick',myClick);
  };
  
-function mouseMoved() {
+function mouseMoved() { // No creo que vayamos a necesitar esto
   var position = {x: mouseX, y: mouseY};
   socket.emit('myPosition',position);
 }

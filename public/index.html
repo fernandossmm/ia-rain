@@ -1,23 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/p5.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/addons/p5.dom.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/addons/p5.sound.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.3.5/p5.min.js"></script>
+    <script src="https://github.com/processing/p5.js-sound/releases/download/0.3.5/p5.sound.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
-    <script src="./p5.sound.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css">
     <meta charset="utf-8" />
 
 </head>
 <body>
-  <video class="videobg" src="media/video.mp4" poster="media/video.jpg" autoplay loop muted>
-		<source src="media/video.webm" type="video/web">
-		<source src="media/video.mp4" type="video/mp4">
-	</video>
   <script src="sketch.js"></script>
   <script src="Player.js"></script>
-  <canvas id="container" width="1" height="1" style="position:absolute"></canvas>
+  <canvas id="container" width="1" height="1"></canvas>
   <script type="module" src="src/index3.js"></script>
+  
+  <!-- <video class="background" src="media/video.mp4" poster="media/video.jpg" autoplay  muted><! loop >
+		<source src="media/video.webm" type="video/web">
+		<source src="media/video.mp4" type="video/mp4">
+	</video> -->
 </body>
 </html>
