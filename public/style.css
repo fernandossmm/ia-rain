@@ -19,7 +19,7 @@ canvas {
     left: 0px;
     up: 0px;
     
-    z-index: 50;
+    z-index: 150;
 }
 
 #container {

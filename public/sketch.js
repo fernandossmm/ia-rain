@@ -20,10 +20,11 @@ function setup() {
 }
 
 function draw() {
-  background(220);
+  background(220,220,220,0);
+  
+  circle(500,200,200);
   
   players.forEach(player => player.draw());
-  circle(x,y,30);
 }
 
 function updatePlayers(serverPlayers) {
