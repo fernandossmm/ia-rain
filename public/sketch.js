@@ -8,7 +8,8 @@ var x = 0;
 var y = 0;
 var mouseIsPressed;
 
-socket.on("heartbeat", players => updatePlayers(players));
+socket.on("heartbeatPlayers", players => updatePlayers(players));
+socket.on("heartbeatSounds", sounds => playSounds(sounds));
 socket.on("disconnect", playerId => removePlayer(playerId));
 
 function preload() {
@@ -36,6 +37,30 @@ function updatePlayers(serverPlayers) {
   }
 }
 
+function playSounds(sounds) {
+  played = false;
+  if(sounds.length>0){
+    for(i = 0; i<sounds.length;i++){
+      array = sounds[i].players;
+
+      for(j=0;j<array.length;j++){
+        if(socket.id === array[j]){
+          played = true;
+        }
+      }
+
+      if(!played){
+        s = sounds[0].sound;
+        song.play();
+        var play = {index: i};
+        socket.emit('play',play);
+      }else{
+        played = false;
+      }
+    }
+  }
+}
+
 function playerExists(playerFromServer) {
   for (let i = 0; i < players.length; i++) {
     if (players[i].id === playerFromServer) {
@@ -50,7 +75,7 @@ function removePlayer(playerId) {
 }
 
 function mouseClicked(){
- // song.play();
+  //song.play();
   var myClick = {x: mouseX, y: mouseY};
   //x = mouseX;
   //y= mouseY;
@@ -107,7 +132,7 @@ function init() {
       gainNode.gain.value = (CurX/WIDTH) * maxVol;
       biquadFilter.frequency.value = (CurY/HEIGHT) * maxFreq;
 
-      audioElement.play();
+      //audioElement.play();
     }
   }
 }

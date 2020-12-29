@@ -13,7 +13,7 @@ let players = [];
 
 let sounds = [];
 
-setInterval(updateGame, 16);
+setInterval(updateGame, 60);
 
 io.sockets.on("connection", socket => {
   console.log(`New connection ${socket.id}`);
@@ -21,12 +21,18 @@ io.sockets.on("connection", socket => {
   
   socket.on('myClick', function (data) {
       io.sockets.emit("click",data);
-      players.forEach(player => {
-        player.addSound(data);
-        console.log(player.id+":");
-        console.log(player.sounds);
-      });
+      var sound = {sound: data, players: []};
+      sounds.push(sound);
   });
+
+  socket.on('play', function (data) {
+    sounds[data.index].players.push(socket.id);
+    //if(sounds[data.index].players.length == players.length){
+      //sounds.splice(data.index,1);
+    //}
+    console.log(sounds);
+    console.log("/////////////////////////////////////////////////////")
+});
 
   socket.on("disconnect", () => {
       io.sockets.emit("disconnect", socket.id);
@@ -40,5 +46,6 @@ io.sockets.on("disconnect", socket => {
 });
 
 function updateGame() {
-  io.sockets.emit("heartbeat", players);
+  io.sockets.emit("heartbeatPlayers", players);
+  io.sockets.emit ("heartbeatSounds",sounds);
 }
