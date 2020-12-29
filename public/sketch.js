@@ -44,6 +44,13 @@ Button.prototype.stroke=function(){
   rect(this.x,this.y,this.width,this.height);
 }
 
+Button.prototype.isMouseInside = function() {
+  return mouseX > this.x &&
+         mouseX < (this.x + this.width) &&
+         mouseY > this.y &&
+         mouseY < (this.y + this.height);
+};
+
 function updatePlayers(serverPlayers) {
   for (let i = 0; i < serverPlayers.length; i++) {
     let playerFromServer = serverPlayers[i];
@@ -69,16 +76,13 @@ function removePlayer(playerId) {
 function mouseClicked(){
  // song.play();
   var myClick = {x: mouseX, y: mouseY};
-  // instrumento 1
-  if(btnInstrumento1.click()) {
-    console.log("instrumento1");
-  } 
-  // instrumento 2
-  if(btnInstrumento2.click()) {
-    console.log("instrumento2");
-  } 
-  //x = mouseX;
-  //y= mouseY;
+ 
+  if (btnInstrumento1.isMouseInside()) {
+    console.log("Instrumento 1");
+  } else if (btnInstrumento2.isMouseInside()) {
+    console.log("Instrumento 2");
+  }
+
   socket.emit('myClick',myClick);
  };
 
