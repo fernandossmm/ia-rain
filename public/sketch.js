@@ -7,6 +7,7 @@ var song = null;
 var x = 0;
 var y = 0;
 var mouseIsPressed;
+var btnInstrumento1, btnInstrumento2;
 
 socket.on("heartbeat", players => updatePlayers(players));
 socket.on("disconnect", playerId => removePlayer(playerId));
@@ -22,9 +23,25 @@ function setup() {
 function draw() {
   background(220,220,220,0);
   
+  btnInstrumento1=new Button(0,0,window.innerWidth/2,100);
+  btnInstrumento2=new Button(window.innerWidth/2,0,window.innerWidth/2,100);
+
+  btnInstrumento1.stroke();
+  btnInstrumento2.stroke();
   //circle(500,200,200);
   
   //players.forEach(player => player.draw());
+}
+
+function Button(x,y,width,height){
+  this.x=x;
+  this.y=y;
+  this.width=width;
+  this.height=height;
+}
+
+Button.prototype.stroke=function(){
+  rect(this.x,this.y,this.width,this.height);
 }
 
 function updatePlayers(serverPlayers) {
@@ -52,6 +69,14 @@ function removePlayer(playerId) {
 function mouseClicked(){
  // song.play();
   var myClick = {x: mouseX, y: mouseY};
+  // instrumento 1
+  if(btnInstrumento1.click()) {
+    console.log("instrumento1");
+  } 
+  // instrumento 2
+  if(btnInstrumento2.click()) {
+    console.log("instrumento2");
+  } 
   //x = mouseX;
   //y= mouseY;
   socket.emit('myClick',myClick);
