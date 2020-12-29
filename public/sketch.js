@@ -107,7 +107,7 @@ function init() {
       gainNode.gain.value = (CurX/WIDTH) * maxVol;
       biquadFilter.frequency.value = (CurY/HEIGHT) * maxFreq;
 
-     // audioElement.play();
+      audioElement.play();
     }
   }
 }
