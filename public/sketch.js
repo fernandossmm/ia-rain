@@ -23,8 +23,8 @@ function setup() {
 function draw() {
   background(220,220,220,0);
   
-  btnInstrumento1=new Button(0,0,window.innerWidth/2,100);
-  btnInstrumento2=new Button(window.innerWidth/2,0,window.innerWidth/2,100);
+  btnInstrumento1=new Button(0,0,window.innerWidth/2,50,"Instrumento 1");
+  btnInstrumento2=new Button(window.innerWidth/2,0,window.innerWidth/2,50,"Instrumento 2");
 
   btnInstrumento1.stroke();
   btnInstrumento2.stroke();
@@ -33,15 +33,17 @@ function draw() {
   //players.forEach(player => player.draw());
 }
 
-function Button(x,y,width,height){
+function Button(x,y,width,height,text){
   this.x=x;
   this.y=y;
   this.width=width;
   this.height=height;
+  this.text=text;
 }
 
 Button.prototype.stroke=function(){
   rect(this.x,this.y,this.width,this.height);
+  text(this.text, this.x+10, this.y+this.height/4);
 }
 
 Button.prototype.isMouseInside = function() {
@@ -78,9 +80,9 @@ function mouseClicked(){
   var myClick = {x: mouseX, y: mouseY};
  
   if (btnInstrumento1.isMouseInside()) {
-    console.log("Instrumento 1");
+    console.log(btnInstrumento1.text);
   } else if (btnInstrumento2.isMouseInside()) {
-    console.log("Instrumento 2");
+    console.log(btnInstrumento2.text);
   }
 
   socket.emit('myClick',myClick);
