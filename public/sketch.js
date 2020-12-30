@@ -94,28 +94,7 @@ function mouseClicked(){
 window.addEventListener('click', init);
 
 function init() {
-  /*
-  // create web audio api context
-  var AudioContext = window.AudioContext || window.webkitAudioContext;
-  var audioCtx = new AudioContext();
-
-  // load some sound
-  const audioElement = document.querySelector('audio');
-  const track = audioCtx.createMediaElementSource(audioElement);
-
-  // create biquadFilter and gain node
-  const biquadFilter = audioCtx.createBiquadFilter();  
-  const gainNode = audioCtx.createGain();
-
-  // connect our graph
-  track.connect(biquadFilter);
-  biquadFilter.connect(gainNode);
-  gainNode.connect(audioCtx.destination);
-  */
-
   //create a synth and connect it to the main output (your speakers)
-// const synth = new Tone.Synth().toMaster();
-
   const vol = new Tone.Volume(0).toMaster();
   const synth = new Tone.Synth().connect(vol);
 
@@ -134,7 +113,6 @@ function init() {
   
   document.onmousemove = updatePage;
 
-
   function updatePage(e) {
     if(mouseIsPressed){
       CurX = (window.Event) ? e.pageX : Event.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
@@ -146,13 +124,8 @@ function init() {
       vol.volume.value = (CurX/WIDTH) * maxVol;
       frequency = (CurY/HEIGHT) * maxFreq;
       
-      //play a middle 'C' for the duration of an 8th note
-      synth.triggerAttackRelease(frequency, "4n");
-
-//     gainNode.gain.value = (CurX/WIDTH) * maxVol;
-//     biquadFilter.frequency.value = (CurY/HEIGHT) * maxFreq;
-
-//      audioElement.play();
+      // play
+      synth.triggerAttackRelease(frequency, "16n");
     }
   }
 }
