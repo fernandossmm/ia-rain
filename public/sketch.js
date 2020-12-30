@@ -116,14 +116,11 @@ function init() {
   //create a synth and connect it to the main output (your speakers)
   const synth = new Tone.Synth().toMaster();
 
-  //play a middle 'C' for the duration of an 8th note
-  synth.triggerAttackRelease("C4", "8n");
-
   // create initial frequency and volumn values
   var WIDTH = window.innerWidth;
   var HEIGHT = window.innerHeight;
 
-  var maxFreq = 6000;
+  var maxFreq = 600;
   var maxVol = 2;
 
   // Mouse pointer coordinates
@@ -143,7 +140,12 @@ function init() {
       var myClick = {x: mouseX, y: mouseY};
       socket.emit('myClick',myClick);
 
-//      gainNode.gain.value = (CurX/WIDTH) * maxVol;
+      frequency = (CurY/HEIGHT) * maxFreq;
+      
+      //play a middle 'C' for the duration of an 8th note
+      synth.triggerAttackRelease(frequency, "8n");
+
+//     gainNode.gain.value = (CurX/WIDTH) * maxVol;
 //     biquadFilter.frequency.value = (CurY/HEIGHT) * maxFreq;
 
 //      audioElement.play();
