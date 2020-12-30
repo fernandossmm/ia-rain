@@ -8,8 +8,8 @@ var x = 0;
 var y = 0;
 var mouseIsPressed;
 
-socket.on("heartbeatPlayers", players => updatePlayers(players));
-socket.on("heartbeatSounds", sounds => playSounds(sounds));
+socket.on("heartbeat", players => updatePlayers(players));
+socket.on("play", s => playSounds(s));
 socket.on("disconnect", playerId => removePlayer(playerId));
 
 function preload() {
@@ -37,28 +37,8 @@ function updatePlayers(serverPlayers) {
   }
 }
 
-function playSounds(sounds) {
-  played = false;
-  if(sounds.length>0){
-    for(i = 0; i<sounds.length;i++){
-      array = sounds[i].players;
-
-      for(j=0;j<array.length;j++){
-        if(socket.id === array[j]){
-          played = true;
-        }
-      }
-
-      if(!played){
-        s = sounds[0].sound;
+function playSounds(s) {
         song.play();
-        var play = {index: i};
-        socket.emit('play',play);
-      }else{
-        played = false;
-      }
-    }
-  }
 }
 
 function playerExists(playerFromServer) {
@@ -75,10 +55,7 @@ function removePlayer(playerId) {
 }
 
 function mouseClicked(){
-  //song.play();
   var myClick = {x: mouseX, y: mouseY};
-  //x = mouseX;
-  //y= mouseY;
   socket.emit('myClick',myClick);
  };
 
