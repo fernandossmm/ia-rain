@@ -95,15 +95,16 @@ window.addEventListener('click', init);
 
 function init() {
   //create a synth and connect it to the main output (your speakers)
-  const vol = new Tone.Volume(0).toMaster();
-  const synth = new Tone.Synth().connect(vol);
+  const vol = new Tone.Volume().toMaster();
+  const filter = new Tone.Filter().connect(vol);
+  const player = new Tone.Player("media/Re.wav").connect(filter);
 
   // create initial frequency and volumn values
   var WIDTH = window.innerWidth;
   var HEIGHT = window.innerHeight;
 
   var maxFreq = 600;
-  var maxVol = 40;
+  var maxVol = 10;
 
   // Mouse pointer coordinates
   var CurX, CurY;
@@ -122,10 +123,9 @@ function init() {
       socket.emit('myClick',myClick);
 
       vol.volume.value = (CurX/WIDTH) * maxVol;
-      frequency = (CurY/HEIGHT) * maxFreq;
-      
-      // play
-      synth.triggerAttackRelease(frequency, "16n");
+      filter.frequency.value = (CurY/HEIGHT) * maxFreq;
+
+      player.start();
     }
   }
 }
