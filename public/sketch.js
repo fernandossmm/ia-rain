@@ -94,6 +94,7 @@ function mouseClicked(){
 window.addEventListener('click', init);
 
 function init() {
+  /*
   // create web audio api context
   var AudioContext = window.AudioContext || window.webkitAudioContext;
   var audioCtx = new AudioContext();
@@ -110,6 +111,13 @@ function init() {
   track.connect(biquadFilter);
   biquadFilter.connect(gainNode);
   gainNode.connect(audioCtx.destination);
+  */
+
+  //create a synth and connect it to the main output (your speakers)
+  const synth = new Tone.Synth().toMaster();
+
+  //play a middle 'C' for the duration of an 8th note
+  synth.triggerAttackRelease("C4", "8n");
 
   // create initial frequency and volumn values
   var WIDTH = window.innerWidth;
@@ -135,10 +143,10 @@ function init() {
       var myClick = {x: mouseX, y: mouseY};
       socket.emit('myClick',myClick);
 
-      gainNode.gain.value = (CurX/WIDTH) * maxVol;
-      biquadFilter.frequency.value = (CurY/HEIGHT) * maxFreq;
+//      gainNode.gain.value = (CurX/WIDTH) * maxVol;
+//     biquadFilter.frequency.value = (CurY/HEIGHT) * maxFreq;
 
-      audioElement.play();
+//      audioElement.play();
     }
   }
 }
