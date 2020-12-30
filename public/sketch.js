@@ -78,46 +78,42 @@ function removePlayer(playerId) {
 function mouseClicked(){
  // song.play();
   var myClick = {x: mouseX, y: mouseY};
- 
-  if (btnInstrumento1.isMouseInside()) {
-    console.log(btnInstrumento1.text);
-  } else if (btnInstrumento2.isMouseInside()) {
-    console.log(btnInstrumento2.text);
-  }
-
   socket.emit('myClick',myClick);
  };
 
 ////////////////////////////////////////
 ////////// SONIDO //////////////////////
 ////////////////////////////////////////
+
+//create a synth and connect it to the main output (your speakers)
+const vol = new Tone.Volume().toMaster();
+const filter = new Tone.Filter().connect(vol);
+const player = new Tone.Player("media/Re.wav").connect(filter);
+
+// create initial frequency and volumn values
+var WIDTH = window.innerWidth;
+var HEIGHT = window.innerHeight;
+
+var maxFreq = 600;
+var maxVol = 10;
+
 window.addEventListener('click', init);
 
 function init() {
-  //create a synth and connect it to the main output (your speakers)
-  const vol = new Tone.Volume().toMaster();
-  const filter = new Tone.Filter().connect(vol);
-  const player = new Tone.Player("media/Re.wav").connect(filter);
-
-  // create initial frequency and volumn values
-  var WIDTH = window.innerWidth;
-  var HEIGHT = window.innerHeight;
-
-  var maxFreq = 600;
-  var maxVol = 10;
-
-  // Mouse pointer coordinates
-  var CurX, CurY;
+  if (btnInstrumento1.isMouseInside()) {
+    player.load("media/Bam.mp3");
+  } else if (btnInstrumento2.isMouseInside()) {
+    player.load("media/Re.wav");
+  }
 
   // Get new mouse pointer coordinates when mouse is moved
   // then set new gain and frequency values
-  
   document.onmousemove = updatePage;
 
   function updatePage(e) {
     if(mouseIsPressed){
-      CurX = (window.Event) ? e.pageX : Event.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
-      CurY = (window.Event) ? e.pageY : Event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
+      var CurX = (window.Event) ? e.pageX : Event.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
+      var CurY = (window.Event) ? e.pageY : Event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
 
       var myClick = {x: mouseX, y: mouseY};
       socket.emit('myClick',myClick);
