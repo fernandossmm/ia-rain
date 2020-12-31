@@ -9,6 +9,13 @@ var y = 0;
 var mouseIsPressed;
 var btnInstrumento1, btnInstrumento2;
 
+// create initial frequency and volumn values
+var WIDTH = window.innerWidth;
+var HEIGHT = window.innerHeight;
+
+var maxFreq = 600;
+var maxVol = 10;
+
 socket.on("heartbeat", players => updatePlayers(players));
 socket.on("play", s => playSounds(s));
 socket.on("disconnect", playerId => removePlayer(playerId));
@@ -20,9 +27,14 @@ function preload() {
 var synth;
 var now;
 
+var vol, filter;
+var CurX, CurY;
+
 function setup() {
   createCanvas(screen.width, screen.height-screen.height*0.17);
-  synth = new Tone.Synth().toMaster();
+  vol = new Tone.Volume().toMaster();
+  filter = new Tone.Filter().connect(vol);
+  synth = new Tone.Synth().connect(filter);
   now = Tone.now();
 }
 
@@ -91,14 +103,26 @@ function mouseClicked(){
  };
  
 
- function mousePressed()
+ function mousePressed(e)
  {
+    CurX = (window.Event) ? e.pageX : Event.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
+    CurY = (window.Event) ? e.pageY : Event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
+    
+    vol.volume.value = (CurX/WIDTH) * maxVol;
+    filter.frequency.value = (CurY/HEIGHT) * maxFreq;
+
     now = Tone.now();
-    
     synth.triggerAttack("C4", now);
-    
  }
  
+ function mouseMoved(e) {
+    CurX = (window.Event) ? e.pageX : Event.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
+    CurY = (window.Event) ? e.pageY : Event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
+    
+    vol.volume.value = (CurX/WIDTH) * maxVol;
+    filter.frequency.value = (CurY/HEIGHT) * maxFreq;
+ }
+
  function mouseReleased()
  {
    now = Tone.now();
@@ -109,7 +133,7 @@ function mouseClicked(){
 ////////////////////////////////////////
 ////////// SONIDO //////////////////////
 ////////////////////////////////////////
-
+/*
 //create a synth and connect it to the main output (your speakers)
 const vol = new Tone.Volume().toMaster();
 const filter = new Tone.Filter().connect(vol);
@@ -150,3 +174,4 @@ function init() {
     }
   }
 }
+*/
