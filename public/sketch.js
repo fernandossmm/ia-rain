@@ -17,8 +17,13 @@ function preload() {
   song = loadSound('media/Bam.mp3');
 }
 
+var synth;
+var now;
+
 function setup() {
   createCanvas(screen.width, screen.height-screen.height*0.17);
+  synth = new Tone.Synth().toMaster();
+  now = Tone.now();
 }
 
 function draw() {
@@ -64,7 +69,7 @@ function updatePlayers(serverPlayers) {
 }
 
 function playSounds(s) {
-        song.play();
+        //song.play();
 }
 
 function playerExists(playerFromServer) {
@@ -84,6 +89,22 @@ function mouseClicked(){
   var myClick = {x: mouseX, y: mouseY};
   socket.emit('myClick',myClick);
  };
+ 
+
+ function mousePressed()
+ {
+    now = Tone.now();
+    
+    synth.triggerAttack("C4", now);
+    
+ }
+ 
+ function mouseReleased()
+ {
+   now = Tone.now();
+   
+   synth.triggerRelease(now);
+ }
 
 ////////////////////////////////////////
 ////////// SONIDO //////////////////////
@@ -92,7 +113,7 @@ function mouseClicked(){
 //create a synth and connect it to the main output (your speakers)
 const vol = new Tone.Volume().toMaster();
 const filter = new Tone.Filter().connect(vol);
-const player = new Tone.Player("media/Re.wav").connect(filter);
+const player = new Tone.Player("media/Re.mp3").connect(filter);
 
 // create initial frequency and volumn values
 var WIDTH = window.innerWidth;
@@ -107,7 +128,7 @@ function init() {
   if (btnInstrumento1.isMouseInside()) {
     player.load("media/Bam.mp3");
   } else if (btnInstrumento2.isMouseInside()) {
-    player.load("media/Re.wav");
+    player.load("media/Re.mp3");
   }
 
   // Get new mouse pointer coordinates when mouse is moved
@@ -125,7 +146,7 @@ function init() {
       vol.volume.value = (CurX/WIDTH) * maxVol;
       filter.frequency.value = (CurY/HEIGHT) * maxFreq;
 
-      player.start();
+      //player.start();
     }
   }
 }
