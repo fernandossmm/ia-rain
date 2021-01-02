@@ -33,7 +33,7 @@ var vol, filter;
 var CurX, CurY;
 
 function setup() {
-  createCanvas(screen.width, screen.height-screen.height*0.17);
+  createCanvas(WIDTH, HEIGHT);
   vol = new Tone.Volume().toMaster();
   filter = new Tone.Filter().connect(vol);
   synth = new Tone.Synth().connect(filter);
@@ -43,12 +43,22 @@ function setup() {
 function draw() {
   background(220,220,220,0);
   
-  btnInstrumento1=new Button(0,0,window.innerWidth/2,50,"Instrumento 1");
-  btnInstrumento2=new Button(window.innerWidth/2,0,window.innerWidth/2,50,"Instrumento 2");
+  btnInstrumento1=new Button(0,0,WIDTH/2,50,"Instrumento 1");
+  btnInstrumento2=new Button(WIDTH/2,0,WIDTH/2,50,"Instrumento 2");
 
   btnInstrumento1.stroke();
   btnInstrumento2.stroke();
 
+  var divisionAncho = WIDTH/16;
+  var divisionAlto = HEIGHT/16;
+  var lineaAncho = divisionAncho;
+  var lineaAlto = divisionAlto;
+  for (let i=0; i<15; i++) {
+    line(lineaAncho, 0, lineaAncho, HEIGHT);
+    line(0, lineaAlto, WIDTH, lineaAlto);
+    lineaAncho += divisionAncho;
+    lineaAlto += divisionAlto;
+  }
 }
 
 function Button(x,y,width,height,text){
