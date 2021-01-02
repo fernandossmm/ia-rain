@@ -19,7 +19,7 @@ io.sockets.on("connection", socket => {
   
   socket.on('myClick', function (data) {
       io.sockets.emit("click",data);
-      var sound = {x: data.x, y: data.y};
+      sound = filterSound(data);
       io.sockets.emit("play",sound);
   });
 
@@ -36,4 +36,20 @@ io.sockets.on("disconnect", socket => {
 
 function updateGame() {
   io.sockets.emit("heartbeat", players);
+}
+
+function filterSound(sound){
+x = sound.x;
+y = sound.y;
+
+v = 1+ ((x/16) * 10);
+f = y;
+
+if(f>8){
+return {nota: "C4", volumen: v};
+}else{
+return {nota: "A4", volumen: v};
+}
+
+
 }

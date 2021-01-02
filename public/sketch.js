@@ -81,9 +81,10 @@ function updatePlayers(serverPlayers) {
 }
 
 function playSounds(s) {
-  //song.play();
+  vol.volume.value = s.volumen;
+  now = Tone.now();
   synth.triggerRelease(now);
-  synth.triggerAttack(now);
+  synth.triggerAttack(s.nota,now);
 }
 
 function playerExists(playerFromServer) {
@@ -100,7 +101,7 @@ function removePlayer(playerId) {
 }
 
 function mouseClicked(){
-  var myClick = {x: mouseX, y: mouseY};
+  var myClick = {x: int((mouseX/width)*16), y: int((mouseY/height)*16)};
   socket.emit('myClick',myClick);
  };
  
@@ -114,7 +115,7 @@ function mouseClicked(){
     filter.frequency.value = (CurY/HEIGHT) * maxFreq;
 
     now = Tone.now();
-    synth.triggerAttack("C4", now);
+    //synth.triggerAttack("C4", now);
  }
  
  function mouseMoved(e) {
