@@ -81,7 +81,9 @@ function updatePlayers(serverPlayers) {
 }
 
 function playSounds(s) {
-        //song.play();
+  //song.play();
+  synth.triggerRelease(now);
+  synth.triggerAttack(now);
 }
 
 function playerExists(playerFromServer) {
