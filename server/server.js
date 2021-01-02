@@ -46,9 +46,9 @@ v = 1+ ((x/16) * 10);
 f = y;
 
 if(f>8){
-return {nota: "C4", volumen: v};
+return {nota: "C4", volumen: v, id: socket.id};
 }else{
-return {nota: "A4", volumen: v};
+return {nota: "A4", volumen: v, id: socket.id};
 }
 
 

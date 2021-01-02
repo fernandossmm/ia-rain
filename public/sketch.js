@@ -9,6 +9,8 @@ var y = 0;
 var mouseIsPressed;
 var btnInstrumento1, btnInstrumento2;
 
+var diccionario = {};
+
 // create initial frequency and volumn values
 var WIDTH = window.innerWidth;
 var HEIGHT = window.innerHeight;
@@ -46,9 +48,7 @@ function draw() {
 
   btnInstrumento1.stroke();
   btnInstrumento2.stroke();
-  //circle(500,200,200);
-  
-  //players.forEach(player => player.draw());
+
 }
 
 function Button(x,y,width,height,text){
@@ -83,6 +83,7 @@ function updatePlayers(serverPlayers) {
 function playSounds(s) {
   vol.volume.value = s.volumen;
   now = Tone.now();
+
   synth.triggerRelease(now);
   synth.triggerAttack(s.nota,now);
 }
