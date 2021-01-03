@@ -33,7 +33,9 @@ var vol;
 function setup() {
   createCanvas(WIDTH, HEIGHT);
   vol = new Tone.Volume().toMaster();
-  synth = new Tone.Synth().connect(vol);
+  s = new Tone.Synth().connect(vol);
+  synth = new Tone.PolySynth(4,Tone.Synth).toMaster();
+  synth.set("voices",[s])
   now = Tone.now();
 }
 
@@ -96,9 +98,9 @@ function changeSound(s) {
 }
 
 function stopSound(note) {
-  console.log(note);
-  //si pongo la nota no funciona, no sé por qué (Ana)
-  synth.triggerRelease(now);
+  console.log(synth.get("voices"));
+  //synth.releaseAll();
+  synth.get("voices").get(0).triggerRelease(["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6"],now);
 }
 
 function playerExists(playerFromServer) {
