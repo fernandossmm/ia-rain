@@ -17,17 +17,16 @@ io.sockets.on("connection", socket => {
   console.log(`New connection ${socket.id}`);
   players.push(new Player(socket.id));
   
-  socket.on('myClick', function (data) {
-      io.sockets.emit("click",data);
+  socket.on('pressed', function (data) {
       sound = filterSound(data);
       io.sockets.emit("play",sound);
   });
-  socket.on('myMove', function (data) {
+  socket.on('moved', function (data) {
     sound = filterSound(data);
-    io.sockets.emit("play",sound);
+    io.sockets.emit("move",sound);
   });
-  socket.on('myRelease', function () {
-    io.sockets.emit("stop");
+  socket.on('released', function (data) {
+    io.sockets.emit("stop",data);
   });
   socket.on("disconnect", () => {
       io.sockets.emit("disconnect", socket.id);

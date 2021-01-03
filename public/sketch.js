@@ -3,21 +3,23 @@ p5.disableFriendlyErrors = true;
 const socket = io.connect('http://localhost');
 
 let players = [];
-//var song = null;
 var x = 0;
 var y = 0;
 var mouseIsPressed;
 var btnInstrumento1, btnInstrumento2;
+
+var actualNote;
 
 var diccionario = {};
 
 const WIDTH = window.innerWidth;
 const HEIGHT = window.innerHeight;
 
+/// Client events
 socket.on("heartbeat", players => updatePlayers(players));
 socket.on("play", s => playSounds(s));
 socket.on("move", s => changeSound(s));
-socket.on("stop", stopSound());
+socket.on("stop", note => stopSound(note));
 socket.on("disconnect", playerId => removePlayer(playerId));
 
 function preload() {
@@ -27,6 +29,7 @@ function preload() {
 var synth;
 var now;
 var vol;
+
 function setup() {
   createCanvas(WIDTH, HEIGHT);
   vol = new Tone.Volume().toMaster();
@@ -82,21 +85,20 @@ function updatePlayers(serverPlayers) {
 
 function playSounds(s) {
   vol.volume.value = s.volumen;
-  now = Tone.now();
-  // sonido continuo:
-  //synth.triggerRelease(["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6"], now);
-  //synth.triggerAttack(s.nota,"16n",now);
-  // sonido al hacer clic:
-  synth.triggerAttackRelease(s.nota,"16n",now);
+  actualNote = s.nota;
+  synth.triggerAttack(s.nota,now);
 }
 
 function changeSound(s) {
   vol.volume.value = s.volumen;
+  actualNote = s.nota;
   synth.setNote(s.nota);
 }
 
-function stopSound() {
-  //synth.triggerRelease(["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6"], now);
+function stopSound(note) {
+  console.log(note);
+  //si pongo la nota no funciona, no sé por qué (Ana)
+  synth.triggerRelease(now);
 }
 
 function playerExists(playerFromServer) {
@@ -111,28 +113,17 @@ function playerExists(playerFromServer) {
 function removePlayer(playerId) {
   players = players.filter(player => player.id !== playerId);
 }
-
-function mouseClicked() {
-  var myClick = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
-  socket.emit('myClick',myClick);
- };
  
  function mousePressed() {
-  //var gridPosition = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
-    
-  //vol.volume.value = (CurX/WIDTH) * maxVol;
-
-  //now = Tone.now();
-  //synth.triggerAttack("C4", now);
+  var myClick = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
+  socket.emit('pressed',myClick);
 }
  
-function mouseMoved() {
+function mouseDragged() {
   var gridPosition = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
-  //socket.emit('myMove',gridPosition);
+  socket.emit('moved',gridPosition);
 }
 
 function mouseReleased() {
-  socket.emit('myRelease');
-  //now = Tone.now();
-  //synth.triggerRelease(["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6"], now);
+  socket.emit('released', actualNote);
 }
