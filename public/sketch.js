@@ -24,15 +24,10 @@ function preload() {
 
 var synth;
 var now;
-
 var vol;
-//var filter;
-//var CurX, CurY;
-
 function setup() {
   createCanvas(WIDTH, HEIGHT);
   vol = new Tone.Volume().toMaster();
-  //filter = new Tone.Filter().connect(vol);
   synth = new Tone.Synth().connect(vol);
   now = Tone.now();
 }
@@ -108,7 +103,6 @@ function mouseClicked(){
   socket.emit('myClick',myClick);
  };
  
-
  function mousePressed(e)
  {
     //CurX = (window.Event) ? e.pageX : Event.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
@@ -131,51 +125,5 @@ function mouseClicked(){
 
  function mouseReleased() {
    now = Tone.now();
-  // synth.triggerRelease(["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6"], now + 4);
+  // synth.triggerRelease(["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6"], now);
  }
-
-////////////////////////////////////////
-////////// SONIDO //////////////////////
-////////////////////////////////////////
-/*
-//create a synth and connect it to the main output (your speakers)
-const vol = new Tone.Volume().toMaster();
-const filter = new Tone.Filter().connect(vol);
-const player = new Tone.Player("media/Re.mp3").connect(filter);
-
-// create initial frequency and volumn values
-var WIDTH = window.innerWidth;
-var HEIGHT = window.innerHeight;
-
-var maxFreq = 600;
-var maxVol = 10;
-
-window.addEventListener('click', init);
-
-function init() {
-  if (btnInstrumento1.isMouseInside()) {
-    player.load("media/Bam.mp3");
-  } else if (btnInstrumento2.isMouseInside()) {
-    player.load("media/Re.mp3");
-  }
-
-  // Get new mouse pointer coordinates when mouse is moved
-  // then set new gain and frequency values
-  document.onmousemove = updatePage;
-
-  function updatePage(e) {
-    if(mouseIsPressed){
-      var CurX = (window.Event) ? e.pageX : Event.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
-      var CurY = (window.Event) ? e.pageY : Event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
-
-      var myClick = {x: mouseX, y: mouseY};
-      socket.emit('myClick',myClick);
-
-      vol.volume.value = (CurX/WIDTH) * maxVol;
-      filter.frequency.value = (CurY/HEIGHT) * maxFreq;
-
-      //player.start();
-    }
-  }
-}
-*/
