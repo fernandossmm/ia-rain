@@ -22,7 +22,13 @@ io.sockets.on("connection", socket => {
       sound = filterSound(data);
       io.sockets.emit("play",sound);
   });
-
+  socket.on('myMove', function (data) {
+    sound = filterSound(data);
+    io.sockets.emit("play",sound);
+  });
+  socket.on('myRelease', function () {
+    io.sockets.emit("stop");
+  });
   socket.on("disconnect", () => {
       io.sockets.emit("disconnect", socket.id);
       players = players.filter(player => player.id !== socket.id);

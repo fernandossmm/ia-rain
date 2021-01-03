@@ -16,6 +16,8 @@ const HEIGHT = window.innerHeight;
 
 socket.on("heartbeat", players => updatePlayers(players));
 socket.on("play", s => playSounds(s));
+socket.on("move", s => changeSound(s));
+socket.on("stop", stopSound());
 socket.on("disconnect", playerId => removePlayer(playerId));
 
 function preload() {
@@ -81,8 +83,17 @@ function updatePlayers(serverPlayers) {
 function playSounds(s) {
   vol.volume.value = s.volumen;
   now = Tone.now();
-//  synth.triggerRelease(["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6"], now);
+  //synth.triggerRelease(["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6"], now);
   synth.triggerAttackRelease(s.nota,"16n",now);
+}
+
+function changeSound(s) {
+  vol.volume.value = s.volumen;
+  synth.setNote(s.nota);
+}
+
+function stopSound() {
+  //synth.triggerRelease(["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6"], now);
 }
 
 function playerExists(playerFromServer) {
@@ -98,32 +109,27 @@ function removePlayer(playerId) {
   players = players.filter(player => player.id !== playerId);
 }
 
-function mouseClicked(){
+function mouseClicked() {
   var myClick = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
   socket.emit('myClick',myClick);
  };
  
- function mousePressed(e)
- {
-    //CurX = (window.Event) ? e.pageX : Event.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
-    //CurY = (window.Event) ? e.pageY : Event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
+ function mousePressed() {
+  //var gridPosition = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
     
-    //vol.volume.value = (CurX/WIDTH) * maxVol;
-    //filter.frequency.value = (CurY/HEIGHT) * maxFreq;
+  //vol.volume.value = (CurX/WIDTH) * maxVol;
 
-    //now = Tone.now();
-    //synth.triggerAttack("C4", now);
- }
+  //now = Tone.now();
+  //synth.triggerAttack("C4", now);
+}
  
- function mouseMoved(e) {
-    //CurX = (window.Event) ? e.pageX : Event.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
-    //CurY = (window.Event) ? e.pageY : Event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
-    
-    //vol.volume.value = (CurX/WIDTH) * maxVol;
-    //filter.frequency.value = (CurY/HEIGHT) * maxFreq;
- }
+function mouseMoved() {
+  var gridPosition = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
+  //socket.emit('myMove',gridPosition);
+}
 
- function mouseReleased() {
-   now = Tone.now();
-  // synth.triggerRelease(["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6"], now);
- }
+function mouseReleased() {
+  socket.emit('myRelease');
+  //now = Tone.now();
+  //synth.triggerRelease(["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6"], now);
+}
