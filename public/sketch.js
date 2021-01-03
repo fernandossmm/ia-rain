@@ -83,7 +83,10 @@ function updatePlayers(serverPlayers) {
 function playSounds(s) {
   vol.volume.value = s.volumen;
   now = Tone.now();
+  // sonido continuo:
   //synth.triggerRelease(["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6"], now);
+  //synth.triggerAttack(s.nota,"16n",now);
+  // sonido al hacer clic:
   synth.triggerAttackRelease(s.nota,"16n",now);
 }
 
