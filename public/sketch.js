@@ -3,7 +3,7 @@ p5.disableFriendlyErrors = true;
 const socket = io.connect('http://localhost');
 
 let players = [];
-var song = null;
+//var song = null;
 var x = 0;
 var y = 0;
 var mouseIsPressed;
@@ -11,32 +11,29 @@ var btnInstrumento1, btnInstrumento2;
 
 var diccionario = {};
 
-// create initial frequency and volumn values
-var WIDTH = window.innerWidth;
-var HEIGHT = window.innerHeight;
-
-var maxFreq = 600;
-var maxVol = 10;
+const WIDTH = window.innerWidth;
+const HEIGHT = window.innerHeight;
 
 socket.on("heartbeat", players => updatePlayers(players));
 socket.on("play", s => playSounds(s));
 socket.on("disconnect", playerId => removePlayer(playerId));
 
 function preload() {
-  song = loadSound('media/Bam.mp3');
+  //song = loadSound('media/Bam.mp3');
 }
 
 var synth;
 var now;
 
-var vol, filter;
-var CurX, CurY;
+var vol;
+//var filter;
+//var CurX, CurY;
 
 function setup() {
   createCanvas(WIDTH, HEIGHT);
   vol = new Tone.Volume().toMaster();
-  filter = new Tone.Filter().connect(vol);
-  synth = new Tone.Synth().connect(filter);
+  //filter = new Tone.Filter().connect(vol);
+  synth = new Tone.Synth().connect(vol);
   now = Tone.now();
 }
 
@@ -51,13 +48,9 @@ function draw() {
 
   var divisionAncho = WIDTH/16;
   var divisionAlto = HEIGHT/16;
-  var lineaAncho = divisionAncho;
-  var lineaAlto = divisionAlto;
-  for (let i=0; i<15; i++) {
-    line(lineaAncho, 0, lineaAncho, HEIGHT);
-    line(0, lineaAlto, WIDTH, lineaAlto);
-    lineaAncho += divisionAncho;
-    lineaAlto += divisionAlto;
+  for (let i=1; i<16; i++) {
+    line(divisionAncho*i, 0, divisionAncho*i, HEIGHT);
+    line(0, divisionAlto*i, WIDTH, divisionAlto*i);
   }
 }
 
@@ -93,9 +86,8 @@ function updatePlayers(serverPlayers) {
 function playSounds(s) {
   vol.volume.value = s.volumen;
   now = Tone.now();
-
-  synth.triggerRelease(now);
-  synth.triggerAttack(s.nota,now);
+//  synth.triggerRelease(["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6"], now);
+  synth.triggerAttackRelease(s.nota,"16n",now);
 }
 
 function playerExists(playerFromServer) {
@@ -112,36 +104,34 @@ function removePlayer(playerId) {
 }
 
 function mouseClicked(){
-  var myClick = {x: int((mouseX/width)*16), y: int((mouseY/height)*16)};
+  var myClick = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
   socket.emit('myClick',myClick);
  };
  
 
  function mousePressed(e)
  {
-    CurX = (window.Event) ? e.pageX : Event.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
-    CurY = (window.Event) ? e.pageY : Event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
+    //CurX = (window.Event) ? e.pageX : Event.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
+    //CurY = (window.Event) ? e.pageY : Event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
     
-    vol.volume.value = (CurX/WIDTH) * maxVol;
-    filter.frequency.value = (CurY/HEIGHT) * maxFreq;
+    //vol.volume.value = (CurX/WIDTH) * maxVol;
+    //filter.frequency.value = (CurY/HEIGHT) * maxFreq;
 
-    now = Tone.now();
+    //now = Tone.now();
     //synth.triggerAttack("C4", now);
  }
  
  function mouseMoved(e) {
-    CurX = (window.Event) ? e.pageX : Event.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
-    CurY = (window.Event) ? e.pageY : Event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
+    //CurX = (window.Event) ? e.pageX : Event.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
+    //CurY = (window.Event) ? e.pageY : Event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
     
-    vol.volume.value = (CurX/WIDTH) * maxVol;
-    filter.frequency.value = (CurY/HEIGHT) * maxFreq;
+    //vol.volume.value = (CurX/WIDTH) * maxVol;
+    //filter.frequency.value = (CurY/HEIGHT) * maxFreq;
  }
 
- function mouseReleased()
- {
+ function mouseReleased() {
    now = Tone.now();
-   
-   synth.triggerRelease(now);
+  // synth.triggerRelease(["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6"], now + 4);
  }
 
 ////////////////////////////////////////
