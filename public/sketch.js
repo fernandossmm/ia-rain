@@ -7,6 +7,7 @@ var x = 0;
 var y = 0;
 var mouseIsPressed;
 var btnInstrumento1, btnInstrumento2;
+var instrumentoActual;
 
 var playersInstrument = {};
 var numPlayers;
@@ -42,7 +43,8 @@ function setup() {
 
   Tone.Buffer.on('load', function() {
     NProgress.done();
-    samples["piano"].connect(vol);
+    instrumentoActual = "piano";
+    samples[instrumentoActual].connect(vol);
     //samples["piano"].toMaster();
 
     //samples["cello"].connect(vol);
@@ -114,14 +116,13 @@ function assignInstrument(data){
 
 function playSounds(s) {
   vol.volume.value = s.volumen;
-  samples["piano"].triggerAttack(s.nota);
+  samples[instrumentoActual].triggerAttack(s.nota);
   //samples[playersInstrument[s.id]].triggerAttack(s.nota,now).toMaster();
   //synth.voices[index].triggerAttack(s.nota,now);
 }
 
 function changeSound(s) {
   /*
-  vol.volume.value = s.volumen;
   i = samples[playersInstrument[s.id]];
   i.triggerRelease(now);
   i.triggerAttack(s.nota,now);
@@ -133,7 +134,7 @@ function changeSound(s) {
 function stopSound(userId) {
   //["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6"]
   //samples[playersInstrument[userId]].triggerRelease(now);
-  samples["piano"].triggerRelease(now);
+  samples[instrumentoActual].triggerRelease(now);
 }
 
 function playerExists(playerFromServer) {
@@ -150,6 +151,18 @@ function removePlayer(playerId) {
 }
  
  function mousePressed() {
+  if (btnInstrumento1.isMouseInside()) {
+    //console.log("instrumento 1");
+    samples[instrumentoActual].disconnect(vol);
+    instrumentoActual = "piano";
+    samples[instrumentoActual].connect(vol);
+  } 
+  if (btnInstrumento2.isMouseInside()) {
+    //console.log("instrumento 2");
+    samples[instrumentoActual].disconnect(vol);
+    instrumentoActual = "cello";
+    samples[instrumentoActual].connect(vol);
+  }
   var myClick = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
   socket.emit('pressed',myClick);
 }
