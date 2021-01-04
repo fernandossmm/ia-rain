@@ -8,9 +8,8 @@ var y = 0;
 var mouseIsPressed;
 var btnInstrumento1, btnInstrumento2;
 
-var actualNote;
-
-var diccionario = {};
+var playersSynth = {};
+var numPlayers;
 
 const WIDTH = window.innerWidth;
 const HEIGHT = window.innerHeight;
@@ -19,7 +18,7 @@ const HEIGHT = window.innerHeight;
 socket.on("heartbeat", players => updatePlayers(players));
 socket.on("play", s => playSounds(s));
 socket.on("move", s => changeSound(s));
-socket.on("stop", note => stopSound(note));
+socket.on("stop", userId => stopSound(userId));
 socket.on("disconnect", playerId => removePlayer(playerId));
 
 function preload() {
@@ -75,8 +74,10 @@ Button.prototype.isMouseInside = function() {
 };
 
 function updatePlayers(serverPlayers) {
+  numPlayers = serverPlayers.length; //más adelante no hay que dejar que sean más de 4
   for (let i = 0; i < serverPlayers.length; i++) {
     let playerFromServer = serverPlayers[i];
+    playersSynth[playerFromServer.id] = i;
     if (!playerExists(playerFromServer)) {
       players.push(new Player(playerFromServer));
     }
@@ -85,20 +86,21 @@ function updatePlayers(serverPlayers) {
 
 function playSounds(s) {
   vol.volume.value = s.volumen;
-  actualNote = s.nota;
-  synth.voices[0].triggerAttack(s.nota,now);
+  index = playersSynth[s.id];
+  synth.voices[index].triggerAttack(s.nota,now);
 }
 
 function changeSound(s) {
   vol.volume.value = s.volumen;
-  actualNote = s.nota;
-  synth.voices[0].setNote(s.nota);
+  index = playersSynth[s.id];
+  synth.voices[index].setNote(s.nota);
 }
 
-function stopSound(note) {
+function stopSound(userId) {
   //console.log(synth.voices.length);
   //synth.releaseAll();
-  synth.voices[0].triggerRelease(["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6"],now);
+  index = playersSynth[userId];
+  synth.voices[index].triggerRelease(["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6"],now);
 }
 
 function playerExists(playerFromServer) {
@@ -125,5 +127,5 @@ function mouseDragged() {
 }
 
 function mouseReleased() {
-  socket.emit('released', actualNote);
+  socket.emit('released');
 }

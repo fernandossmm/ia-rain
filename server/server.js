@@ -18,15 +18,15 @@ io.sockets.on("connection", socket => {
   players.push(new Player(socket.id));
   
   socket.on('pressed', function (data) {
-      sound = filterSound(data);
+      sound = filterSound(data, socket.id);
       io.sockets.emit("play",sound);
   });
   socket.on('moved', function (data) {
-    sound = filterSound(data);
+    sound = filterSound(data, socket.id);
     io.sockets.emit("move",sound);
   });
-  socket.on('released', function (data) {
-    io.sockets.emit("stop",data);
+  socket.on('released', function () {
+    io.sockets.emit("stop",socket.id);
   });
   socket.on("disconnect", () => {
       io.sockets.emit("disconnect", socket.id);
@@ -43,7 +43,7 @@ function updateGame() {
   io.sockets.emit("heartbeat", players);
 }
 
-function filterSound(sound){
+function filterSound(sound, userId){
   x = sound.x;
   y = sound.y;
 
@@ -168,5 +168,5 @@ function filterSound(sound){
       break;
   }
 
-  return {nota: f, volumen: v, id: socket.id};
+  return {nota: f, volumen: v, id: userId};
 }
