@@ -35,7 +35,6 @@ function setup() {
   vol = new Tone.Volume().toMaster();
   s = new Tone.Synth().connect(vol);
   synth = new Tone.PolySynth(4,Tone.Synth).toMaster();
-  synth.set("voices",[s])
   now = Tone.now();
 }
 
@@ -88,7 +87,7 @@ function updatePlayers(serverPlayers) {
 function playSounds(s) {
   vol.volume.value = s.volumen;
   actualNote = s.nota;
-  synth.triggerAttack(s.nota,now);
+  synth.voices[0].triggerAttack(s.nota,now);
 }
 
 function changeSound(s) {
@@ -98,9 +97,9 @@ function changeSound(s) {
 }
 
 function stopSound(note) {
-  console.log(synth.get("voices"));
+  //console.log(synth.voices.length);
   //synth.releaseAll();
-  synth.get("voices").get(0).triggerRelease(["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6"],now);
+  synth.voices[0].triggerRelease(["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6"],now);
 }
 
 function playerExists(playerFromServer) {
