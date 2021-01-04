@@ -16,21 +16,12 @@ var instruments = ['piano', 'bass-electric', 'bassoon', 'cello', 'clarinet', 'co
 const WIDTH = window.innerWidth;
 const HEIGHT = window.innerHeight;
 
-/// Client events
-socket.on("heartbeat", players => updatePlayers(players));
-socket.on("play", s => playSounds(s));
-socket.on("move", s => changeSound(s));
-socket.on("stop", userId => stopSound(userId));
-socket.on("assignInstrument", data => assignInstrument(data));
-socket.on("disconnect", playerId => removePlayer(playerId));
-
 function preload() {
 }
 
 var synth;
 var now;
 var vol;
-
 var samples;
 
 function setup() {
@@ -47,14 +38,28 @@ function setup() {
   samples = SampleLibrary.load({
     instruments: ['piano', 'bass-electric', 'bassoon', 'cello', 'clarinet', 'contrabass', 'flute', 'french-horn', 'guitar-acoustic', 'guitar-electric','guitar-nylon', 'harmonium', 'harp', 'organ', 'saxophone', 'trombone', 'trumpet', 'tuba', 'violin', 'xylophone'],
     baseUrl: "./samples/"
-        })
+  })
 
-  samples["piano"].connect(vol);
-  samples["piano"].toMaster();
+  Tone.Buffer.on('load', function() {
+    NProgress.done();
+    samples["piano"].connect(vol);
+    //samples["piano"].toMaster();
 
-  samples["cello"].connect(vol);
-  samples["cello"].toMaster();
+    //samples["cello"].connect(vol);
+    //samples["cello"].toMaster();
 
+    /// Client events
+    socket.on("heartbeat", players => updatePlayers(players));
+    socket.on("play", s => playSounds(s));
+    socket.on("move", s => changeSound(s));
+    socket.on("stop", userId => stopSound(userId));
+    socket.on("assignInstrument", data => assignInstrument(data));
+    socket.on("disconnect", playerId => removePlayer(playerId));
+
+  })
+  Tone.Buffer.on('error', function() {
+    console.log("I'm sorry, there has been an error loading the samples. This demo works best on on the most up-to-date version of Chrome.");
+  })
 }
 
 function draw() {
@@ -109,23 +114,26 @@ function assignInstrument(data){
 
 function playSounds(s) {
   vol.volume.value = s.volumen;
-  //samples["piano"].triggerAttack(s.nota);
-  samples[playersInstrument[s.id]].triggerAttack(s.nota,now).toMaster();
+  samples["piano"].triggerAttack(s.nota);
+  //samples[playersInstrument[s.id]].triggerAttack(s.nota,now).toMaster();
   //synth.voices[index].triggerAttack(s.nota,now);
 }
 
 function changeSound(s) {
+  /*
   vol.volume.value = s.volumen;
   i = samples[playersInstrument[s.id]];
   i.triggerRelease(now);
   i.triggerAttack(s.nota,now);
+  */
   //i.setNote(s.nota);
   //synth.voices[index].setNote(s.nota);
 }
 
 function stopSound(userId) {
   //["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6"]
-  samples[playersInstrument[userId]].triggerRelease(now);
+  //samples[playersInstrument[userId]].triggerRelease(now);
+  samples["piano"].triggerRelease(now);
 }
 
 function playerExists(playerFromServer) {
