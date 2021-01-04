@@ -33,8 +33,7 @@ var vol;
 function setup() {
   createCanvas(WIDTH, HEIGHT);
   vol = new Tone.Volume().toMaster();
-  s = new Tone.Synth().connect(vol);
-  synth = new Tone.PolySynth(4,Tone.Synth).toMaster();
+  synth = new Tone.PolySynth(4,Tone.Synth).connect(vol);
   now = Tone.now();
 }
 
