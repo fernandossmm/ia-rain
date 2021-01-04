@@ -93,7 +93,7 @@ function playSounds(s) {
 function changeSound(s) {
   vol.volume.value = s.volumen;
   actualNote = s.nota;
-  synth.setNote(s.nota);
+  synth.voices[0].setNote(s.nota);
 }
 
 function stopSound(note) {
