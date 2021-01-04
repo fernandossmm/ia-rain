@@ -11,11 +11,16 @@ let io = socket(server);
 
 let players = [];
 
+let instruments = ['piano', 'cello'];
+let occupied = [];
 setInterval(updateGame, 60);
 
 io.sockets.on("connection", socket => {
   console.log(`New connection ${socket.id}`);
   players.push(new Player(socket.id));
+  i = getInstrumentForPlayer();
+  data = {userId: socket.id, instrument: i};
+  socket.emit("assignInstrument", data);
   
   socket.on('pressed', function (data) {
       sound = filterSound(data, socket.id);
@@ -41,6 +46,24 @@ io.sockets.on("disconnect", socket => {
 
 function updateGame() {
   io.sockets.emit("heartbeat", players);
+}
+
+function getInstrumentForPlayer(){
+    for(i = 0; i<instruments.length;i++){
+      if(!isOccupied(instruments[i])){
+        occupied.push(instruments[i]);
+        return instruments[i];
+  }
+}
+}
+
+function isOccupied(instrument){
+  for(i = 0; i<occupied.length;i++){
+    if(occupied[i]===instrument){
+      return true;
+    }
+  }
+  return false;
 }
 
 function filterSound(sound, userId){
