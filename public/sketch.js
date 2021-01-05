@@ -56,6 +56,8 @@ function setup() {
     socket.on("move", s => changeSound(s));
     socket.on("stop", userId => stopSound(userId));
     socket.on("assignInstrument", data => assignInstrument(data));
+    socket.on ("changedInstrument", newInstrument => changeInstrument(newInstrument));
+    socket.on("showMessage",message => alert(message));
     socket.on("disconnect", playerId => removePlayer(playerId));
 
   })
@@ -152,19 +154,25 @@ function removePlayer(playerId) {
  
  function mousePressed() {
   if (btnInstrumento1.isMouseInside()) {
-    //console.log("instrumento 1");
-    samples[instrumentoActual].disconnect(vol);
-    instrumentoActual = "piano";
-    samples[instrumentoActual].connect(vol);
+    sendChangeInstrument("piano");
   } 
   if (btnInstrumento2.isMouseInside()) {
-    //console.log("instrumento 2");
-    samples[instrumentoActual].disconnect(vol);
-    instrumentoActual = "cello";
-    samples[instrumentoActual].connect(vol);
+    sendChangeInstrument("cello");
   }
+  //Esto es para hacer música, cuando pongamos mejor la cuadrícula hay que quitarlo
   var myClick = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
   socket.emit('pressed',myClick);
+}
+
+function sendChangeInstrument(newInstrument){
+  data = {last: instrumentoActual, new: newInstrument };
+  socket.emit("changeInstrument", data);
+}
+
+function changeInstrument(newInstrument){
+  samples[instrumentoActual].disconnect(vol);
+  instrumentoActual = newInstrument;
+  samples[instrumentoActual].connect(vol);
 }
  
 function mouseDragged() {

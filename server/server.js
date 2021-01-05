@@ -10,15 +10,17 @@ app.use(express.static("public"));
 let io = socket(server);
 
 let players = [];
+let playersSockets = {};
 
 let instruments = ['piano', 'cello'];
-let occupied = [];
+let occupied = {};
 setInterval(updateGame, 60);
 
 io.sockets.on("connection", socket => {
   console.log(`New connection ${socket.id}`);
   players.push(new Player(socket.id));
-  i = getInstrumentForPlayer();
+  playersSockets[socket.id]=socket;
+  i = getInstrumentForPlayer(socket.id);
   data = {userId: socket.id, instrument: i};
   socket.emit("assignInstrument", data);
   
@@ -33,32 +35,44 @@ io.sockets.on("connection", socket => {
   socket.on('released', function () {
     io.sockets.emit("stop",socket.id);
   });
+  socket.on("changeInstrument",function(data){
+    if(!isOccupied(data.new)){
+      occupied[socket.id] =data.new;
+      playersSockets[socket.id].emit("changedInstrument",data.new);
+    }
+    else{
+      playersSockets[socket.id].emit("showMessage", "That instrument is being occupied"); //sólo se lo envía al usuario que quiso cambiar de instrumento
+    }
+  });
   socket.on("disconnect", () => {
       io.sockets.emit("disconnect", socket.id);
       players = players.filter(player => player.id !== socket.id);
+      occupied[socket.id] = "null";
+
   });
 });
 
 io.sockets.on("disconnect", socket => {
   io.sockets.emit("disconnect", socket.id);
   players = players.filter(player => player.id !== socket.id);
+  occupied[socket.id] = "null";
 });
 
 function updateGame() {
   io.sockets.emit("heartbeat", players);
 }
 
-function getInstrumentForPlayer(){
+function getInstrumentForPlayer(id){
     for(i = 0; i<instruments.length;i++){
       if(!isOccupied(instruments[i])){
-        occupied.push(instruments[i]);
+        occupied[id]=instruments[i];
         return instruments[i];
   }
 }
 }
 
 function isOccupied(instrument){
-  for(i = 0; i<occupied.length;i++){
+  for(i in occupied){
     if(occupied[i]===instrument){
       return true;
     }
