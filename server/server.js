@@ -12,7 +12,8 @@ let io = socket(server);
 let players = [];
 let playersSockets = {};
 
-let instruments = ['piano', 'cello'];
+//['piano', 'bass-electric', 'bassoon', 'cello', 'clarinet', 'flute', 'french-horn', 'guitar-acoustic', 'guitar-electric','guitar-nylon', 'harmonium', 'harp', 'organ', 'saxophone', 'trombone', 'trumpet', 'tuba', 'violin', 'xylophone'];
+let instruments = ['piano', 'xylophone', 'harp'];
 let occupied = {};
 setInterval(updateGame, 60);
 
@@ -21,19 +22,19 @@ io.sockets.on("connection", socket => {
   players.push(new Player(socket.id, i));
   playersSockets[socket.id]=socket;
   console.log(`New connection ${socket.id}`);
-  
+
   socket.on('pressed', function (data) {
       sound = filterSound(data, socket.id);
       io.sockets.emit("play",sound);
   });
-  socket.on("changeInstrument",function(data){
-    if(!isOccupied(data.new)){
+  socket.on("changeInstrument",function(newIns){
+    if(!isOccupied(newIns)){
       last = occupied[socket.id];
-      occupied[socket.id] =data.new;
+      occupied[socket.id] =newIns;
       p = getPlayer(socket.id);
       if(p !== null){
-        p.instrument = data.new;
-        dat = {newInstrument: data.new, lastInstrument: last};
+        p.instrument = newIns;
+        dat = {newInstrument: newIns, lastInstrument: last};
         playersSockets[socket.id].emit("changedInstrument",dat);
       }
     }

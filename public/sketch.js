@@ -6,26 +6,31 @@ let players = [];
 var x = 0;
 var y = 0;
 var mouseIsPressed;
-var btnInstrumento1, btnInstrumento2;
-var instrumentoActual;
+var btnInstrumento1, btnInstrumento2,btnInstrumento3;
 
 var actualQuadrant, lastQuadrant;
 
-var instrumentsClient = ['piano', 'bass-electric', 'bassoon', 'cello', 'clarinet', 'contrabass', 'flute', 'french-horn', 'guitar-acoustic', 'guitar-electric','guitar-nylon', 'harmonium', 'harp', 'organ', 'saxophone', 'trombone', 'trumpet', 'tuba', 'violin', 'xylophone'];
+var instrumentsClient;
 
 const WIDTH = window.innerWidth;
 const HEIGHT = window.innerHeight;
 
+var divisionAncho = WIDTH/16;
+var divisionAlto = HEIGHT/16;
+
 function preload() {
 }
-
-var synth;
-var now;
 var vol;
 var samples;
 
 function setup() {
   createCanvas(WIDTH, HEIGHT);
+  createInstruments();
+
+  btnInstrumento1=new Button(0,0,WIDTH/3,50,"Piano");
+  btnInstrumento2=new Button(WIDTH/3,0,WIDTH/3,50,"Xylophone");
+  btnInstrumento3=new Button(WIDTH-(WIDTH/3),0,WIDTH/3,50,"Otro");
+
 
   vol = new Tone.Volume().toMaster();
 
@@ -42,6 +47,7 @@ function setup() {
 
     /// Client events
     socket.on("heartbeat", players => updatePlayers(players));
+    socket.on("initializeInstruments", ins => setInstruments(ins));
     socket.on("play", s => playSounds(s));
     socket.on ("changedInstrument", data => changeInstrument(data));
     socket.on("showMessage",message => alert(message));
@@ -49,26 +55,24 @@ function setup() {
 
   })
   Tone.Buffer.on('error', function() {
-    console.log("I'm sorry, there has been an error loading the samples. This demo works best on on the most up-to-date version of Chrome.");
+    alert("Sorry, there has been an error loading the samples. This demo works best on on the most up-to-date version of Chrome.");
   })
 }
 
 function draw() {
   background(220,220,220,0);
   
-  btnInstrumento1=new Button(0,0,WIDTH/2,50,"Piano");
-  btnInstrumento2=new Button(WIDTH/2,0,WIDTH/2,50,"Cello");
-
   btnInstrumento1.stroke();
   btnInstrumento2.stroke();
+  btnInstrumento3.stroke();
 
-  var divisionAncho = WIDTH/16;
-  var divisionAlto = HEIGHT/16;
   for (let i=1; i<16; i++) {
     line(divisionAncho*i, 0, divisionAncho*i, HEIGHT);
     line(0, divisionAlto*i, WIDTH, divisionAlto*i);
   }
 }
+
+////////////////////////////////////////////////////////////////// BUTTONS
 
 function Button(x,y,width,height,text){
   this.x=x;
@@ -141,11 +145,18 @@ function getPlayer(id) {
   return null;
 }
 
-////////////////////////////////////////////////////////////////// CHANGE INSTRUMENTS
+////////////////////////////////////////////////////////////////// INSTRUMENTS
+
+function createInstruments(){
+  socket.emit("getInstruments");
+}
+
+function setInstruments(i){
+  this.instrumentsClient = i;
+}
 
 function sendChangeInstrument(newInstrument){
-  data = {last: instrumentoActual, new: newInstrument };
-  socket.emit("changeInstrument", data);
+  socket.emit("changeInstrument", newInstrument);
 }
 
 function changeInstrument(data){
@@ -161,7 +172,10 @@ function mousePressed() {
     sendChangeInstrument("piano");
   } 
   if (btnInstrumento2.isMouseInside()) {
-    sendChangeInstrument("cello");
+    sendChangeInstrument("xylophone");
+  }
+  if(btnInstrumento3.isMouseInside()){
+    sendChangeInstrument("harp");
   }
   lastQuadrant = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
 
