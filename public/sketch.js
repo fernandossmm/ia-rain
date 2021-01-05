@@ -6,16 +6,18 @@ let players = [];
 var x = 0;
 var y = 0;
 var mouseIsPressed;
-var btnInstrumento1, btnInstrumento2,btnInstrumento3,btnInstrumento4,btnInstrumento5;
+var btnInstrumento1, btnInstrumento2,btnInstrumento3,btnInstrumento4,btnInstrumento5,btnInstrumento6;
 
 var actualQuadrant, lastQuadrant;
 
 var instrumentsClient;
 
-const WIDTH = window.innerWidth;
-const HEIGHT = window.innerHeight;
+const HEIGHTMENU = 50;
 
-var divisionAncho = WIDTH/16;
+const WIDTH = window.innerWidth;
+const HEIGHT = window.innerHeight - HEIGHTMENU;
+
+var divisionAncho =WIDTH/16;
 var divisionAlto = HEIGHT/16;
 
 function preload() {
@@ -24,14 +26,15 @@ var vol;
 var samples;
 
 function setup() {
-  createCanvas(WIDTH, HEIGHT);
+  createCanvas(WIDTH, HEIGHT+HEIGHTMENU);
   createInstruments();
 
-  btnInstrumento1=new Button(0,0,WIDTH/5,50,"Piano");
-  btnInstrumento2=new Button(WIDTH/5,0,WIDTH/5,50,"Xylophone");
-  btnInstrumento3=new Button((2*WIDTH)/5,0,WIDTH/5,50,"Harp");
-  btnInstrumento4 = new Button(((3*WIDTH)/5),0,WIDTH/5,50,"Acoustic Guitar");
-  btnInstrumento5 = new Button(WIDTH-(WIDTH/5),0,WIDTH/5,50,"Electric Guitar");
+  btnInstrumento1=new Button(0,0,WIDTH/6,HEIGHTMENU,"Piano");
+  btnInstrumento2=new Button(WIDTH/6,0,WIDTH/6,HEIGHTMENU,"Xylophone");
+  btnInstrumento3=new Button((2*WIDTH)/6,0,WIDTH/6,HEIGHTMENU,"Harp");
+  btnInstrumento4 = new Button(((3*WIDTH)/6),0,WIDTH/6,HEIGHTMENU,"Acoustic Guitar");
+  btnInstrumento5 = new Button(((4*WIDTH)/6),0,WIDTH/6,HEIGHTMENU,"Electric Guitar");
+  btnInstrumento6 = new Button(WIDTH-(WIDTH/6),0,WIDTH/6,HEIGHTMENU,"Cello");
 
 
   vol = new Tone.Volume().toMaster();
@@ -69,10 +72,13 @@ function draw() {
   btnInstrumento3.stroke();
   btnInstrumento4.stroke();
   btnInstrumento5.stroke();
+  btnInstrumento6.stroke(); 
 
-  for (let i=1; i<16; i++) {
-    line(divisionAncho*i, 0, divisionAncho*i, HEIGHT);
-    line(0, divisionAlto*i, WIDTH, divisionAlto*i);
+  for (let i=0; i<16; i++) {
+    //vertical
+    line(divisionAncho*i, HEIGHTMENU, divisionAncho*i, HEIGHT+HEIGHTMENU);
+    //horizontal
+    line(0, HEIGHTMENU+(divisionAlto*i), WIDTH,HEIGHTMENU+(divisionAlto*i));
   }
 }
 
@@ -104,14 +110,15 @@ function playSounds(s) {
   player = getPlayer(s.id);
   if(player != null){
   vol.volume.value = s.volumen;
-  samples[player.instrument].triggerAttackRelease(s.nota);
+  samples[player.instrument].triggerAttack(s.nota);
+  samples[player.instrument].triggerRelease(s.nota, "+0.8");
   }
 }
 
 function changeSound(s) {
   player = getPlayer(s.id);
-  i = samples[player.instrument];
-  i.triggerAttackRelease(s.nota);
+  samples[player.instrument].triggerAttack(s.nota);
+  samples[player.instrument].triggerRelease(s.nota, "+0.8");
 }
 
 
@@ -187,6 +194,9 @@ function mousePressed() {
   if(btnInstrumento5.isMouseInside()){
     sendChangeInstrument("guitar-electric");
   }
+  if(btnInstrumento6.isMouseInside()){
+    sendChangeInstrument("cello");
+  }
   lastQuadrant = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
 
   //Esto es para hacer música, cuando pongamos mejor la cuadrícula hay que quitarlo
@@ -195,7 +205,8 @@ function mousePressed() {
 }
  
 function mouseDragged() {
-  actualQuadrant = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
+  actualQuadrant = {x: int((mouseX/WIDTH)*16), y: int(((mouseY+HEIGHTMENU/HEIGHT+HEIGHTMENU)-100)*16)};
+  console.log((mouseY+HEIGHTMENU/HEIGHT+HEIGHTMENU)-100);
 
   if (actualQuadrant.x-lastQuadrant.x != 0 || actualQuadrant.y-lastQuadrant.y != 0) {
     socket.emit('pressed',actualQuadrant);

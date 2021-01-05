@@ -13,7 +13,7 @@ let players = [];
 let playersSockets = {};
 
 //['piano', 'bass-electric', 'bassoon', 'cello', 'clarinet', 'flute', 'french-horn', 'guitar-acoustic', 'guitar-electric','guitar-nylon', 'harmonium', 'harp', 'organ', 'saxophone', 'trombone', 'trumpet', 'tuba', 'violin', 'xylophone'];
-let instruments = ['piano', 'xylophone', 'harp','guitar-acoustic','guitar-electric'];
+let instruments = ['piano', 'xylophone', 'harp','guitar-acoustic','guitar-electric', 'cello'];
 let occupied = {};
 setInterval(updateGame, 60);
 
