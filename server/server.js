@@ -17,28 +17,25 @@ let occupied = {};
 setInterval(updateGame, 60);
 
 io.sockets.on("connection", socket => {
-  console.log(`New connection ${socket.id}`);
-  players.push(new Player(socket.id));
-  playersSockets[socket.id]=socket;
   i = getInstrumentForPlayer(socket.id);
-  data = {userId: socket.id, instrument: i};
-  socket.emit("assignInstrument", data);
+  players.push(new Player(socket.id, i));
+  playersSockets[socket.id]=socket;
+  console.log(`New connection ${socket.id}`);
   
   socket.on('pressed', function (data) {
       sound = filterSound(data, socket.id);
       io.sockets.emit("play",sound);
   });
-  socket.on('moved', function (data) {
-    sound = filterSound(data, socket.id);
-    io.sockets.emit("move",sound);
-  });
-  socket.on('released', function () {
-    io.sockets.emit("stop",socket.id);
-  });
   socket.on("changeInstrument",function(data){
     if(!isOccupied(data.new)){
+      last = occupied[socket.id];
       occupied[socket.id] =data.new;
-      playersSockets[socket.id].emit("changedInstrument",data.new);
+      p = getPlayer(socket.id);
+      if(p !== null){
+        p.instrument = data.new;
+        dat = {newInstrument: data.new, lastInstrument: last};
+        playersSockets[socket.id].emit("changedInstrument",dat);
+      }
     }
     else{
       playersSockets[socket.id].emit("showMessage", "That instrument is being occupied"); //sólo se lo envía al usuario que quiso cambiar de instrumento
@@ -64,9 +61,10 @@ function updateGame() {
 
 function getInstrumentForPlayer(id){
     for(i = 0; i<instruments.length;i++){
-      if(!isOccupied(instruments[i])){
-        occupied[id]=instruments[i];
-        return instruments[i];
+      ins = instruments[i];
+      if(!isOccupied(ins)){
+        occupied[id]=ins;
+        return ins;
   }
 }
 }
@@ -80,6 +78,15 @@ function isOccupied(instrument){
   return false;
 }
 
+function getPlayer(id) {
+  for (let i = 0; i < players.length; i++) {
+    if (players[i].id === id) {
+      return players[i];
+    }
+  }
+  return null;
+}
+
 function filterSound(sound, userId){
   x = sound.x;
   y = sound.y;
@@ -89,67 +96,51 @@ function filterSound(sound, userId){
   switch (y) {
     case 0:
       f = "C4";
-      //console.log("C4");
       break;
     case 1:
       f = "D4";
-      //console.log("D4");
       break;
     case 2:
       f = "E4";
-      //console.log("E4");
       break;
     case 3:
       f = "F4";
-      //console.log("F4");
       break;
     case 4:
       f = "G4";
-      //console.log("G4");
       break;
     case 5:
       f = "A4";
-      //console.log("A4");
       break;
     case 6:
       f = "B4";
-      //console.log("B4");
       break;
     case 7:
       f = "C5";
-      //console.log("C5");
       break;
     case 8:
       f = "D5";
-      //console.log("D5");
       break;
     case 9:
       f = "E5";
-      //console.log("E5");
       break;
     case 10:
       f = "F5";
-      //console.log("F5");
       break;
     case 11:
       f = "G5";
-      //console.log("G5");
       break;
     case 12:
       f = "A5";
-      //console.log("A5");
       break;
     case 13:
       f = "B5";
-      //console.log("B5");
       break;
     case 14:
       f = "C6";
-      //console.log("C6");
       break;
     case 15:
       f = "D6";
-      //console.log("D6");
       break;
   }
 

@@ -9,10 +9,7 @@ var mouseIsPressed;
 var btnInstrumento1, btnInstrumento2;
 var instrumentoActual;
 
-var playersInstrument = {};
-var numPlayers;
-
-var instruments = ['piano', 'bass-electric', 'bassoon', 'cello', 'clarinet', 'contrabass', 'flute', 'french-horn', 'guitar-acoustic', 'guitar-electric','guitar-nylon', 'harmonium', 'harp', 'organ', 'saxophone', 'trombone', 'trumpet', 'tuba', 'violin', 'xylophone'];
+var instrumentsClient = ['piano', 'bass-electric', 'bassoon', 'cello', 'clarinet', 'contrabass', 'flute', 'french-horn', 'guitar-acoustic', 'guitar-electric','guitar-nylon', 'harmonium', 'harp', 'organ', 'saxophone', 'trombone', 'trumpet', 'tuba', 'violin', 'xylophone'];
 
 const WIDTH = window.innerWidth;
 const HEIGHT = window.innerHeight;
@@ -28,35 +25,23 @@ var samples;
 function setup() {
   createCanvas(WIDTH, HEIGHT);
 
-  //Synth
   vol = new Tone.Volume().toMaster();
-  //synth = new Tone.PolySynth(4,Tone.Synth).connect(vol);
-  now = Tone.now();
 
   //Instruments
   NProgress.start();
 
   samples = SampleLibrary.load({
-    instruments: ['piano', 'bass-electric', 'bassoon', 'cello', 'clarinet', 'contrabass', 'flute', 'french-horn', 'guitar-acoustic', 'guitar-electric','guitar-nylon', 'harmonium', 'harp', 'organ', 'saxophone', 'trombone', 'trumpet', 'tuba', 'violin', 'xylophone'],
+    instruments: instrumentsClient,
     baseUrl: "./samples/"
   })
 
   Tone.Buffer.on('load', function() {
     NProgress.done();
-    instrumentoActual = "piano";
-    samples[instrumentoActual].connect(vol);
-    //samples["piano"].toMaster();
-
-    //samples["cello"].connect(vol);
-    //samples["cello"].toMaster();
 
     /// Client events
     socket.on("heartbeat", players => updatePlayers(players));
     socket.on("play", s => playSounds(s));
-    socket.on("move", s => changeSound(s));
-    socket.on("stop", userId => stopSound(userId));
-    socket.on("assignInstrument", data => assignInstrument(data));
-    socket.on ("changedInstrument", newInstrument => changeInstrument(newInstrument));
+    socket.on ("changedInstrument", data => changeInstrument(data));
     socket.on("showMessage",message => alert(message));
     socket.on("disconnect", playerId => removePlayer(playerId));
 
@@ -103,40 +88,33 @@ Button.prototype.isMouseInside = function() {
          mouseY < (this.y + this.height);
 };
 
+////////////////////////////////////////////////////////////////// SOUNDS LOGIC
+
+function playSounds(s) {
+  player = getPlayer(s.id);
+  if(player != null){
+  vol.volume.value = s.volumen;
+  samples[player.instrument].triggerAttackRelease(s.nota);
+  }
+}
+
+function changeSound(s) {
+  player = getPlayer(s.id);
+  i = samples[player.instrument];
+  i.triggerAttackRelease(s.nota);
+}
+
+
+////////////////////////////////////////////////////////////////// PLAYERS LOGIC
+
 function updatePlayers(serverPlayers) {
   for (let i = 0; i < serverPlayers.length; i++) {
     let playerFromServer = serverPlayers[i];
     if (!playerExists(playerFromServer)) {
       players.push(new Player(playerFromServer));
+      samples[playerFromServer.instrument].connect(vol);
     }
   }
-}
-
-function assignInstrument(data){
-  playersInstrument[data.userId] = data.instrument;
-}
-
-function playSounds(s) {
-  vol.volume.value = s.volumen;
-  samples[instrumentoActual].triggerAttack(s.nota);
-  //samples[playersInstrument[s.id]].triggerAttack(s.nota,now).toMaster();
-  //synth.voices[index].triggerAttack(s.nota,now);
-}
-
-function changeSound(s) {
-  /*
-  i = samples[playersInstrument[s.id]];
-  i.triggerRelease(now);
-  i.triggerAttack(s.nota,now);
-  */
-  //i.setNote(s.nota);
-  //synth.voices[index].setNote(s.nota);
-}
-
-function stopSound(userId) {
-  //["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6"]
-  //samples[playersInstrument[userId]].triggerRelease(now);
-  samples[instrumentoActual].triggerRelease(now);
 }
 
 function playerExists(playerFromServer) {
@@ -151,8 +129,32 @@ function playerExists(playerFromServer) {
 function removePlayer(playerId) {
   players = players.filter(player => player.id !== playerId);
 }
- 
- function mousePressed() {
+
+function getPlayer(id) {
+  for (let i = 0; i < players.length; i++) {
+    if (players[i].id === id) {
+      return players[i];
+    }
+  }
+  return null;
+}
+
+
+////////////////////////////////////////////////////////////////// CHANGE INSTRUMENTS
+
+function sendChangeInstrument(newInstrument){
+  data = {last: instrumentoActual, new: newInstrument };
+  socket.emit("changeInstrument", data);
+}
+
+function changeInstrument(data){
+  samples[data.lastInstrument].disconnect();
+  samples[data.newInstrument].connect(vol);
+}
+
+////////////////////////////////////////////////////////////////// MOUSE EVENTS
+
+function mousePressed() {
   if (btnInstrumento1.isMouseInside()) {
     sendChangeInstrument("piano");
   } 
@@ -163,23 +165,8 @@ function removePlayer(playerId) {
   var myClick = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
   socket.emit('pressed',myClick);
 }
-
-function sendChangeInstrument(newInstrument){
-  data = {last: instrumentoActual, new: newInstrument };
-  socket.emit("changeInstrument", data);
-}
-
-function changeInstrument(newInstrument){
-  samples[instrumentoActual].disconnect(vol);
-  instrumentoActual = newInstrument;
-  samples[instrumentoActual].connect(vol);
-}
  
 function mouseDragged() {
   var gridPosition = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
-  socket.emit('moved',gridPosition);
-}
-
-function mouseReleased() {
-  socket.emit('released');
+  socket.emit('pressed',gridPosition);
 }
