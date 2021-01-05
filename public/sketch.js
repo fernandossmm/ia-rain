@@ -9,6 +9,8 @@ var mouseIsPressed;
 var btnInstrumento1, btnInstrumento2;
 var instrumentoActual;
 
+var actualQuadrant, lastQuadrant;
+
 var instrumentsClient = ['piano', 'bass-electric', 'bassoon', 'cello', 'clarinet', 'contrabass', 'flute', 'french-horn', 'guitar-acoustic', 'guitar-electric','guitar-nylon', 'harmonium', 'harp', 'organ', 'saxophone', 'trombone', 'trumpet', 'tuba', 'violin', 'xylophone'];
 
 const WIDTH = window.innerWidth;
@@ -139,7 +141,6 @@ function getPlayer(id) {
   return null;
 }
 
-
 ////////////////////////////////////////////////////////////////// CHANGE INSTRUMENTS
 
 function sendChangeInstrument(newInstrument){
@@ -162,12 +163,18 @@ function mousePressed() {
   if (btnInstrumento2.isMouseInside()) {
     sendChangeInstrument("cello");
   }
+  lastQuadrant = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
+
   //Esto es para hacer música, cuando pongamos mejor la cuadrícula hay que quitarlo
   var myClick = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
   socket.emit('pressed',myClick);
 }
  
 function mouseDragged() {
-  var gridPosition = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
-  socket.emit('pressed',gridPosition);
+  actualQuadrant = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
+
+  if (actualQuadrant.x-lastQuadrant.x != 0 || actualQuadrant.y-lastQuadrant.y != 0) {
+    socket.emit('pressed',actualQuadrant);
+  }
+  lastQuadrant = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
 }
