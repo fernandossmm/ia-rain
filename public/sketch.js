@@ -150,6 +150,7 @@ function sendChangeInstrument(newInstrument){
 function changeInstrument(data){
   samples[data.lastInstrument].disconnect();
   samples[data.newInstrument].connect(vol);
+  player.instrument = data.newInstrument;
 }
 
 ////////////////////////////////////////////////////////////////// MOUSE EVENTS
