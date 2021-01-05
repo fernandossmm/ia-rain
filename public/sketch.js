@@ -6,7 +6,7 @@ let players = [];
 var x = 0;
 var y = 0;
 var mouseIsPressed;
-var btnInstrumento1, btnInstrumento2,btnInstrumento3;
+var btnInstrumento1, btnInstrumento2,btnInstrumento3,btnInstrumento4,btnInstrumento5;
 
 var actualQuadrant, lastQuadrant;
 
@@ -27,9 +27,11 @@ function setup() {
   createCanvas(WIDTH, HEIGHT);
   createInstruments();
 
-  btnInstrumento1=new Button(0,0,WIDTH/3,50,"Piano");
-  btnInstrumento2=new Button(WIDTH/3,0,WIDTH/3,50,"Xylophone");
-  btnInstrumento3=new Button(WIDTH-(WIDTH/3),0,WIDTH/3,50,"Otro");
+  btnInstrumento1=new Button(0,0,WIDTH/5,50,"Piano");
+  btnInstrumento2=new Button(WIDTH/5,0,WIDTH/5,50,"Xylophone");
+  btnInstrumento3=new Button((2*WIDTH)/5,0,WIDTH/5,50,"Harp");
+  btnInstrumento4 = new Button(((3*WIDTH)/5),0,WIDTH/5,50,"Acoustic Guitar");
+  btnInstrumento5 = new Button(WIDTH-(WIDTH/5),0,WIDTH/5,50,"Electric Guitar");
 
 
   vol = new Tone.Volume().toMaster();
@@ -65,6 +67,8 @@ function draw() {
   btnInstrumento1.stroke();
   btnInstrumento2.stroke();
   btnInstrumento3.stroke();
+  btnInstrumento4.stroke();
+  btnInstrumento5.stroke();
 
   for (let i=1; i<16; i++) {
     line(divisionAncho*i, 0, divisionAncho*i, HEIGHT);
@@ -176,6 +180,12 @@ function mousePressed() {
   }
   if(btnInstrumento3.isMouseInside()){
     sendChangeInstrument("harp");
+  }
+  if(btnInstrumento4.isMouseInside()){
+    sendChangeInstrument("guitar-acoustic");
+  }
+  if(btnInstrumento5.isMouseInside()){
+    sendChangeInstrument("guitar-electric");
   }
   lastQuadrant = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
 
