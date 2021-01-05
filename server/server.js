@@ -95,52 +95,52 @@ function filterSound(sound, userId){
   var f, v;
   // TONO //
   switch (y) {
-    case 0:
+    case 1:
       f = "C4";
       break;
-    case 1:
+    case 2:
       f = "D4";
       break;
-    case 2:
+    case 3:
       f = "E4";
       break;
-    case 3:
+    case 4:
       f = "F4";
       break;
-    case 4:
+    case 5:
       f = "G4";
       break;
-    case 5:
+    case 6:
       f = "A4";
       break;
-    case 6:
+    case 7:
       f = "B4";
       break;
-    case 7:
+    case 8:
       f = "C5";
       break;
-    case 8:
+    case 9:
       f = "D5";
       break;
-    case 9:
+    case 10:
       f = "E5";
       break;
-    case 10:
+    case 11:
       f = "F5";
       break;
-    case 11:
+    case 12:
       f = "G5";
       break;
-    case 12:
+    case 13:
       f = "A5";
       break;
-    case 13:
+    case 14:
       f = "B5";
       break;
-    case 14:
+    case 15:
       f = "C6";
       break;
-    case 15:
+    case 16:
       f = "D6";
       break;
   }

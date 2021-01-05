@@ -205,8 +205,8 @@ function mousePressed() {
 }
  
 function mouseDragged() {
-  actualQuadrant = {x: int((mouseX/WIDTH)*16), y: int(((mouseY+HEIGHTMENU/HEIGHT+HEIGHTMENU)-100)*16)};
-  console.log((mouseY+HEIGHTMENU/HEIGHT+HEIGHTMENU)-100);
+  actualQuadrant = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
+  console.log(actualQuadrant.y);
 
   if (actualQuadrant.x-lastQuadrant.x != 0 || actualQuadrant.y-lastQuadrant.y != 0) {
     socket.emit('pressed',actualQuadrant);
