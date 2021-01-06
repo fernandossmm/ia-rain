@@ -1,6 +1,7 @@
 class Player {
-  constructor(id) {
+  constructor(id, instrument) {
     this.id = id;
+    this.instrument = instrument;
   }
 }
 

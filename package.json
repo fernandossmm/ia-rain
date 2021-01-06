@@ -10,8 +10,8 @@
   "author": "lg",
   "license": "ISC",
   "dependencies": {
-    "core-js": "^3.6.5",
+    "core-js": "^3.8.2",
     "express": "^4.16.3",
-    "socket.io": "^2.2.0"
+    "socket.io": "^2.4.0"
   }
 }

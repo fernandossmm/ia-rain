@@ -3,41 +3,86 @@ p5.disableFriendlyErrors = true;
 const socket = io.connect('http://localhost');
 
 let players = [];
-var song = null;
 var x = 0;
 var y = 0;
 var mouseIsPressed;
-var btnInstrumento1, btnInstrumento2;
+var btnInstrumento1, btnInstrumento2,btnInstrumento3,btnInstrumento4,btnInstrumento5,btnInstrumento6;
 
-socket.on("heartbeat", players => updatePlayers(players));
-socket.on("play", s => playSounds(s));
-socket.on("disconnect", playerId => removePlayer(playerId));
+var actualQuadrant, lastQuadrant;
+
+var instrumentsClient;
+
+const HEIGHTMENU = 50;
+
+const WIDTH = window.innerWidth;
+const HEIGHT = window.innerHeight - HEIGHTMENU;
+
+var divisionAncho =WIDTH/16;
+var divisionAlto = HEIGHT/16;
 
 function preload() {
-  song = loadSound('media/Bam.mp3');
 }
-
-var synth;
-var now;
+var vol;
+var samples;
 
 function setup() {
-  createCanvas(screen.width, screen.height-screen.height*0.17);
-  synth = new Tone.Synth().toMaster();
-  now = Tone.now();
+  createCanvas(WIDTH, HEIGHT+HEIGHTMENU);
+  createInstruments();
+
+  btnInstrumento1=new Button(0,0,WIDTH/6,HEIGHTMENU,"Piano");
+  btnInstrumento2=new Button(WIDTH/6,0,WIDTH/6,HEIGHTMENU,"Xylophone");
+  btnInstrumento3=new Button((2*WIDTH)/6,0,WIDTH/6,HEIGHTMENU,"Harp");
+  btnInstrumento4 = new Button(((3*WIDTH)/6),0,WIDTH/6,HEIGHTMENU,"Acoustic Guitar");
+  btnInstrumento5 = new Button(((4*WIDTH)/6),0,WIDTH/6,HEIGHTMENU,"Electric Guitar");
+  btnInstrumento6 = new Button(WIDTH-(WIDTH/6),0,WIDTH/6,HEIGHTMENU,"Cello");
+
+
+  vol = new Tone.Volume().toMaster();
+
+  //Instruments
+  NProgress.start();
+
+  samples = SampleLibrary.load({
+    instruments: instrumentsClient,
+    baseUrl: "./samples/"
+  })
+
+  Tone.Buffer.on('load', function() {
+    NProgress.done();
+
+    /// Client events
+    socket.on("heartbeat", players => updatePlayers(players));
+    socket.on("initializeInstruments", ins => setInstruments(ins));
+    socket.on("play", s => playSounds(s));
+    socket.on ("changedInstrument", data => changeInstrument(data));
+    socket.on("showMessage",message => alert(message));
+    socket.on("disconnect", playerId => removePlayer(playerId));
+
+  })
+  Tone.Buffer.on('error', function() {
+    alert("Sorry, there has been an error loading the samples. This demo works best on on the most up-to-date version of Chrome.");
+  })
 }
 
 function draw() {
   background(220,220,220,0);
   
-  btnInstrumento1=new Button(0,0,window.innerWidth/2,50,"Instrumento 1");
-  btnInstrumento2=new Button(window.innerWidth/2,0,window.innerWidth/2,50,"Instrumento 2");
-
   btnInstrumento1.stroke();
   btnInstrumento2.stroke();
-  //circle(500,200,200);
-  
-  //players.forEach(player => player.draw());
+  btnInstrumento3.stroke();
+  btnInstrumento4.stroke();
+  btnInstrumento5.stroke();
+  btnInstrumento6.stroke(); 
+
+  for (let i=0; i<16; i++) {
+    //vertical
+    line(divisionAncho*i, HEIGHTMENU, divisionAncho*i, HEIGHT+HEIGHTMENU);
+    //horizontal
+    line(0, HEIGHTMENU+(divisionAlto*i), WIDTH,HEIGHTMENU+(divisionAlto*i));
+  }
 }
+
+////////////////////////////////////////////////////////////////// BUTTONS
 
 function Button(x,y,width,height,text){
   this.x=x;
@@ -59,17 +104,34 @@ Button.prototype.isMouseInside = function() {
          mouseY < (this.y + this.height);
 };
 
+////////////////////////////////////////////////////////////////// SOUNDS LOGIC
+
+function playSounds(s) {
+  player = getPlayer(s.id);
+  if(player != null){
+  vol.volume.value = s.volumen;
+  samples[player.instrument].triggerAttack(s.nota);
+  samples[player.instrument].triggerRelease(s.nota, "+0.8");
+  }
+}
+
+function changeSound(s) {
+  player = getPlayer(s.id);
+  samples[player.instrument].triggerAttack(s.nota);
+  samples[player.instrument].triggerRelease(s.nota, "+0.8");
+}
+
+
+////////////////////////////////////////////////////////////////// PLAYERS LOGIC
+
 function updatePlayers(serverPlayers) {
   for (let i = 0; i < serverPlayers.length; i++) {
     let playerFromServer = serverPlayers[i];
     if (!playerExists(playerFromServer)) {
       players.push(new Player(playerFromServer));
+      samples[playerFromServer.instrument].connect(vol);
     }
   }
-}
-
-function playSounds(s) {
-        //song.play();
 }
 
 function playerExists(playerFromServer) {
@@ -85,68 +147,69 @@ function removePlayer(playerId) {
   players = players.filter(player => player.id !== playerId);
 }
 
-function mouseClicked(){
-  var myClick = {x: mouseX, y: mouseY};
-  socket.emit('myClick',myClick);
- };
- 
-
- function mousePressed()
- {
-    now = Tone.now();
-    
-    synth.triggerAttack("C4", now);
-    
- }
- 
- function mouseReleased()
- {
-   now = Tone.now();
-   
-   synth.triggerRelease(now);
- }
-
-////////////////////////////////////////
-////////// SONIDO //////////////////////
-////////////////////////////////////////
-
-//create a synth and connect it to the main output (your speakers)
-const vol = new Tone.Volume().toMaster();
-const filter = new Tone.Filter().connect(vol);
-const player = new Tone.Player("media/Re.mp3").connect(filter);
-
-// create initial frequency and volumn values
-var WIDTH = window.innerWidth;
-var HEIGHT = window.innerHeight;
-
-var maxFreq = 600;
-var maxVol = 10;
-
-window.addEventListener('click', init);
-
-function init() {
-  if (btnInstrumento1.isMouseInside()) {
-    player.load("media/Bam.mp3");
-  } else if (btnInstrumento2.isMouseInside()) {
-    player.load("media/Re.mp3");
-  }
-
-  // Get new mouse pointer coordinates when mouse is moved
-  // then set new gain and frequency values
-  document.onmousemove = updatePage;
-
-  function updatePage(e) {
-    if(mouseIsPressed){
-      var CurX = (window.Event) ? e.pageX : Event.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
-      var CurY = (window.Event) ? e.pageY : Event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
-
-      var myClick = {x: mouseX, y: mouseY};
-      socket.emit('myClick',myClick);
-
-      vol.volume.value = (CurX/WIDTH) * maxVol;
-      filter.frequency.value = (CurY/HEIGHT) * maxFreq;
-
-      //player.start();
+function getPlayer(id) {
+  for (let i = 0; i < players.length; i++) {
+    if (players[i].id === id) {
+      return players[i];
     }
   }
+  return null;
+}
+
+////////////////////////////////////////////////////////////////// INSTRUMENTS
+
+function createInstruments(){
+  socket.emit("getInstruments");
+}
+
+function setInstruments(i){
+  this.instrumentsClient = i;
+}
+
+function sendChangeInstrument(newInstrument){
+  socket.emit("changeInstrument", newInstrument);
+}
+
+function changeInstrument(data){
+  samples[data.lastInstrument].disconnect();
+  samples[data.newInstrument].connect(vol);
+  player.instrument = data.newInstrument;
+}
+
+////////////////////////////////////////////////////////////////// MOUSE EVENTS
+
+function mousePressed() {
+  if (btnInstrumento1.isMouseInside()) {
+    sendChangeInstrument("piano");
+  } 
+  if (btnInstrumento2.isMouseInside()) {
+    sendChangeInstrument("xylophone");
+  }
+  if(btnInstrumento3.isMouseInside()){
+    sendChangeInstrument("harp");
+  }
+  if(btnInstrumento4.isMouseInside()){
+    sendChangeInstrument("guitar-acoustic");
+  }
+  if(btnInstrumento5.isMouseInside()){
+    sendChangeInstrument("guitar-electric");
+  }
+  if(btnInstrumento6.isMouseInside()){
+    sendChangeInstrument("cello");
+  }
+  lastQuadrant = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
+
+  //Esto es para hacer música, cuando pongamos mejor la cuadrícula hay que quitarlo
+  var myClick = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
+  socket.emit('pressed',myClick);
+}
+ 
+function mouseDragged() {
+  actualQuadrant = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
+  console.log(actualQuadrant.y);
+
+  if (actualQuadrant.x-lastQuadrant.x != 0 || actualQuadrant.y-lastQuadrant.y != 0) {
+    socket.emit('pressed',actualQuadrant);
+  }
+  lastQuadrant = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
 }
