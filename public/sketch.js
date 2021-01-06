@@ -206,24 +206,24 @@ function mousePressed() {
     sendChangeInstrument("cello");
   }
   lastGridPosition = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
-
-  //Esto es para hacer música, cuando pongamos mejor la cuadrícula hay que quitarlo
   var myClick = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
+
+  if(myClick.y != 0){
   socket.emit('pressed',myClick);
+  }
 }
 
 function mouseReleased() {
-  console.log("released");
-  //Esto es para hacer música, cuando pongamos mejor la cuadrícula hay que quitarlo
   var myClick = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
   socket.emit('released',myClick);
 }
  
 function mouseDragged() {
   currentGridPosition = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
-
+  if(currentGridPosition.y != 0){
   if (currentGridPosition.x-lastGridPosition.x != 0 || currentGridPosition.y-lastGridPosition.y != 0) {
     socket.emit('pressed',currentGridPosition);
   }
   lastGridPosition = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
+}
 }
