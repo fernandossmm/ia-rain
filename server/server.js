@@ -94,108 +94,14 @@ function filterSound(sound, userId){
 
   var f, v;
   // TONO //
-  switch (y) {
-    case 1:
-      f = "C4";
-      break;
-    case 2:
-      f = "D4";
-      break;
-    case 3:
-      f = "E4";
-      break;
-    case 4:
-      f = "F4";
-      break;
-    case 5:
-      f = "G4";
-      break;
-    case 6:
-      f = "A4";
-      break;
-    case 7:
-      f = "B4";
-      break;
-    case 8:
-      f = "C5";
-      break;
-    case 9:
-      f = "D5";
-      break;
-    case 10:
-      f = "E5";
-      break;
-    case 11:
-      f = "F5";
-      break;
-    case 12:
-      f = "G5";
-      break;
-    case 13:
-      f = "A5";
-      break;
-    case 14:
-      f = "B5";
-      break;
-    case 15:
-      f = "C6";
-      break;
-    case 16:
-      f = "D6";
-      break;
-  }
+  notas = ["B", "A", "G", "F", "E", "D", "C"]
+  startingOctave = 5;
+  
+  f = notas[(y)%notas.length]+""+(startingOctave-Math.floor(y/notas.length));
+  console.log(f);
 
   // VOLUMEN //
-  switch (x) {
-    case 0:
-      v = -8;
-      break;
-    case 1:
-      v = -7;
-      break;
-    case 2:
-      v = -6;
-      break;
-    case 3:
-      v = -5;
-      break;
-    case 4:
-      v = -4;
-      break;
-    case 5:
-      v = -3;
-      break;
-    case 6:
-      v = -2;
-      break;
-    case 7:
-      v = -1;
-      break;
-    case 8:
-      v = 0;
-      break;
-    case 9:
-      v = 1;
-      break;
-    case 10:
-      v = 2;
-      break;
-    case 11:
-      v = 3;
-      break;
-    case 12:
-      v = 4;
-      break;
-    case 13:
-      v = 5;
-      break;
-    case 14:
-      v = 6;
-      break;
-    case 15:
-      v = 7;
-      break;
-  }
-
+  v = x-7;
+    
   return {nota: f, volumen: v, id: userId};
 }
