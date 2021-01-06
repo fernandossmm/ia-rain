@@ -27,6 +27,9 @@ io.sockets.on("connection", socket => {
       sound = filterSound(data, socket.id);
       io.sockets.emit("play",sound);
   });
+  socket.on('released', function (data) {
+      io.sockets.emit("stop",socket.id);
+  });
   socket.on("changeInstrument",function(newIns){
     if(!isOccupied(newIns)){
       last = occupied[socket.id];
@@ -98,7 +101,6 @@ function filterSound(sound, userId){
   startingOctave = 5;
   
   f = notas[(y)%notas.length]+""+(startingOctave-Math.floor(y/notas.length));
-  console.log(f);
 
   // VOLUMEN //
   v = x-7;

@@ -8,7 +8,7 @@ var y = 0;
 var mouseIsPressed;
 var btnInstrumento1, btnInstrumento2,btnInstrumento3,btnInstrumento4,btnInstrumento5,btnInstrumento6;
 
-var actualQuadrant, lastQuadrant;
+var currentGridPosition, lastGridPosition;
 
 var instrumentsClient;
 
@@ -54,6 +54,7 @@ function setup() {
     socket.on("heartbeat", players => updatePlayers(players));
     socket.on("initializeInstruments", ins => setInstruments(ins));
     socket.on("play", s => playSounds(s));
+    socket.on("stop", pId => stopSounds(pId));
     socket.on ("changedInstrument", data => changeInstrument(data));
     socket.on("showMessage",message => alert(message));
     socket.on("disconnect", playerId => removePlayer(playerId));
@@ -110,15 +111,22 @@ function playSounds(s) {
   player = getPlayer(s.id);
   if(player != null){
   vol.volume.value = s.volumen;
+  samples[player.instrument].releaseAll();
   samples[player.instrument].triggerAttack(s.nota);
-  samples[player.instrument].triggerRelease(s.nota, "+0.8");
+  }
+}
+
+function stopSounds(pId) {
+  player = getPlayer(pId);
+  if(player != null){
+  samples[player.instrument].releaseAll();
   }
 }
 
 function changeSound(s) {
   player = getPlayer(s.id);
-  samples[player.instrument].triggerAttack(s.nota);
-  samples[player.instrument].triggerRelease(s.nota, "+0.8");
+  samples[player.instrument].releaseAll();
+  samples[player.instrument].triggerAttack(s.nota, "+0.1");
 }
 
 
@@ -197,19 +205,25 @@ function mousePressed() {
   if(btnInstrumento6.isMouseInside()){
     sendChangeInstrument("cello");
   }
-  lastQuadrant = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
+  lastGridPosition = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
 
   //Esto es para hacer música, cuando pongamos mejor la cuadrícula hay que quitarlo
   var myClick = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
   socket.emit('pressed',myClick);
 }
+
+function mouseReleased() {
+  console.log("released");
+  //Esto es para hacer música, cuando pongamos mejor la cuadrícula hay que quitarlo
+  var myClick = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
+  socket.emit('released',myClick);
+}
  
 function mouseDragged() {
-  actualQuadrant = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
-  console.log(actualQuadrant.y);
+  currentGridPosition = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
 
-  if (actualQuadrant.x-lastQuadrant.x != 0 || actualQuadrant.y-lastQuadrant.y != 0) {
-    socket.emit('pressed',actualQuadrant);
+  if (currentGridPosition.x-lastGridPosition.x != 0 || currentGridPosition.y-lastGridPosition.y != 0) {
+    socket.emit('pressed',currentGridPosition);
   }
-  lastQuadrant = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
+  lastGridPosition = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
 }
