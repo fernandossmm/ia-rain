@@ -17,8 +17,7 @@ jobs:
           npm install
 
       - name: Deploy 🚀
-        run: |
-          npm start
+        run: npm start
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages # The branch the action should deploy to.
