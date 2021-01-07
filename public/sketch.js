@@ -67,7 +67,7 @@ function setup() {
   
   background(220,220,220,0);
   
-  stroke(200,200,200,30);
+  stroke(230,230,230,40);
   for (let i=0; i<16; i++) {
     //vertical
     line(divisionAncho*i, HEIGHTMENU, divisionAncho*i, HEIGHT+HEIGHTMENU);
