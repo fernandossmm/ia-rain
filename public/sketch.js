@@ -50,6 +50,8 @@ function setup() {
   Tone.Buffer.on('load', function() {
     NProgress.done();
 
+    $(".loader").fadeOut("slow");
+
     /// Client events
     socket.on("heartbeat", players => updatePlayers(players));
     socket.on("initializeInstruments", ins => setInstruments(ins));
