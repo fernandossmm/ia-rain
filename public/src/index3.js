@@ -50,7 +50,7 @@ function init(){
     {
       minR:35,
       maxR:70,
-      rainChance: 0.3,
+      rainChance: 0.4,
       randomDropsRMultiplier: 0.4,
       autoShrinkRate: 0.035,
       dropletsRate:2,
