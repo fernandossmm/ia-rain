@@ -15,6 +15,9 @@ let playersSockets = {};
 //['piano', 'bass-electric', 'bassoon', 'cello', 'clarinet', 'flute', 'french-horn', 'guitar-acoustic', 'guitar-electric','guitar-nylon', 'harmonium', 'harp', 'organ', 'saxophone', 'trombone', 'trumpet', 'tuba', 'violin', 'xylophone'];
 let instruments = ['piano', 'xylophone', 'harp','guitar-acoustic','guitar-electric', 'cello'];
 let occupied = {};
+
+let currentlyPressed = [];
+
 setInterval(updateGame, 60);
 
 io.sockets.on("connection", socket => {
@@ -24,12 +27,21 @@ io.sockets.on("connection", socket => {
   console.log(`New connection ${socket.id}`);
 
   socket.on('pressed', function (data) {
-      sound = filterSound(data, socket.id);
-      io.sockets.emit("play",sound);
+      if(data.play)
+      {
+        sound = filterSound(data, socket.id);
+        io.sockets.emit("play",sound);
+      }
+      
+      currentlyPressed[socket.id] = {x: data.x, y: data.y};
   });
+  
   socket.on('released', function (data) {
       io.sockets.emit("stop",socket.id);
+      
+      delete currentlyPressed[socket.id];
   });
+  
   socket.on("changeInstrument",function(newIns){
     if(!isOccupied(newIns)){
       last = occupied[socket.id];
@@ -37,7 +49,7 @@ io.sockets.on("connection", socket => {
       p = getPlayer(socket.id);
       if(p !== null){
         p.instrument = newIns;
-        dat = {newInstrument: newIns, lastInstrument: last};
+        dat = {id: socket.id, newInstrument: newIns, lastInstrument: last};
         playersSockets[socket.id].emit("changedInstrument",dat);
       }
     }
@@ -61,6 +73,10 @@ io.sockets.on("disconnect", socket => {
 
 function updateGame() {
   io.sockets.emit("heartbeat", players);
+  
+  var p = Object.keys(currentlyPressed).map(x => currentlyPressed[x]);
+  
+  io.sockets.emit("press", p);
 }
 
 function getInstrumentForPlayer(id){
@@ -92,8 +108,8 @@ function getPlayer(id) {
 }
 
 function filterSound(sound, userId){
-  x = sound.x;
-  y = sound.y;
+  x = Math.round(sound.x*16);
+  y = Math.round(sound.y*16);
 
   var f, v;
   // TONO //

@@ -196,14 +196,14 @@ Raindrops.prototype={
     if(this.options.raining){
       let limit=this.options.rainLimit*timeScale*this.areaMultiplier;
       let count=0;
-      if(mouseIsPressed){  // Drop where mouse pressed
+      for(var press of dropsToAdd){  // Drop where mouse pressed
         count++;
         let r=random(this.options.minR,this.options.maxR,(n)=>{
           return Math.pow(n,3);
         });
         let rainDrop=this.createDrop({
-          x:mouseX,
-          y:mouseY,
+          x:press.x,
+          y:press.y,
           r:r,
           momentum:1+((r-this.options.minR)*0.1)+random(2),
           spreadX:1.5,

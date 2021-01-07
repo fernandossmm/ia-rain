@@ -52,7 +52,7 @@ function init(){
       maxR:70,
       rainChance: 0.3,
       randomDropsRMultiplier: 0.4,
-      autoShrinkRate: 0.05,
+      autoShrinkRate: 0.035,
       dropletsRate:2,
       dropletsSize:[3,7.5],
       collisionRadius:0.45,
