@@ -15,6 +15,9 @@ let playersSockets = {};
 //['piano', 'bass-electric', 'bassoon', 'cello', 'clarinet', 'flute', 'french-horn', 'guitar-acoustic', 'guitar-electric','guitar-nylon', 'harmonium', 'harp', 'organ', 'saxophone', 'trombone', 'trumpet', 'tuba', 'violin', 'xylophone'];
 let instruments = ['piano', 'xylophone', 'harp','guitar-acoustic','guitar-electric', 'cello'];
 let occupied = {};
+
+let currentlyPressed = [];
+
 setInterval(updateGame, 60);
 
 io.sockets.on("connection", socket => {
@@ -24,9 +27,21 @@ io.sockets.on("connection", socket => {
   console.log(`New connection ${socket.id}`);
 
   socket.on('pressed', function (data) {
-      sound = filterSound(data, socket.id);
-      io.sockets.emit("play",sound);
+      if(data.play)
+      {
+        sound = filterSound(data, socket.id);
+        io.sockets.emit("play",sound);
+      }
+      
+      currentlyPressed[socket.id] = {x: data.x, y: data.y};
   });
+  
+  socket.on('released', function (data) {
+      io.sockets.emit("stop",socket.id);
+      
+      delete currentlyPressed[socket.id];
+  });
+  
   socket.on("changeInstrument",function(newIns){
     if(!isOccupied(newIns)){
       last = occupied[socket.id];
@@ -34,7 +49,7 @@ io.sockets.on("connection", socket => {
       p = getPlayer(socket.id);
       if(p !== null){
         p.instrument = newIns;
-        dat = {newInstrument: newIns, lastInstrument: last};
+        dat = {id: socket.id, newInstrument: newIns, lastInstrument: last};
         playersSockets[socket.id].emit("changedInstrument",dat);
       }
     }
@@ -58,6 +73,10 @@ io.sockets.on("disconnect", socket => {
 
 function updateGame() {
   io.sockets.emit("heartbeat", players);
+  
+  var p = Object.keys(currentlyPressed).map(x => currentlyPressed[x]);
+  
+  io.sockets.emit("press", p);
 }
 
 function getInstrumentForPlayer(id){
@@ -89,113 +108,18 @@ function getPlayer(id) {
 }
 
 function filterSound(sound, userId){
-  x = sound.x;
-  y = sound.y;
+  x = Math.round(sound.x*16);
+  y = Math.round(sound.y*16);
 
   var f, v;
   // TONO //
-  switch (y) {
-    case 1:
-      f = "C4";
-      break;
-    case 2:
-      f = "D4";
-      break;
-    case 3:
-      f = "E4";
-      break;
-    case 4:
-      f = "F4";
-      break;
-    case 5:
-      f = "G4";
-      break;
-    case 6:
-      f = "A4";
-      break;
-    case 7:
-      f = "B4";
-      break;
-    case 8:
-      f = "C5";
-      break;
-    case 9:
-      f = "D5";
-      break;
-    case 10:
-      f = "E5";
-      break;
-    case 11:
-      f = "F5";
-      break;
-    case 12:
-      f = "G5";
-      break;
-    case 13:
-      f = "A5";
-      break;
-    case 14:
-      f = "B5";
-      break;
-    case 15:
-      f = "C6";
-      break;
-    case 16:
-      f = "D6";
-      break;
-  }
+  notas = ["B", "A", "G", "F", "E", "D", "C"]
+  startingOctave = 5;
+  
+  f = notas[(y)%notas.length]+""+(startingOctave-Math.floor(y/notas.length));
 
   // VOLUMEN //
-  switch (x) {
-    case 0:
-      v = -8;
-      break;
-    case 1:
-      v = -7;
-      break;
-    case 2:
-      v = -6;
-      break;
-    case 3:
-      v = -5;
-      break;
-    case 4:
-      v = -4;
-      break;
-    case 5:
-      v = -3;
-      break;
-    case 6:
-      v = -2;
-      break;
-    case 7:
-      v = -1;
-      break;
-    case 8:
-      v = 0;
-      break;
-    case 9:
-      v = 1;
-      break;
-    case 10:
-      v = 2;
-      break;
-    case 11:
-      v = 3;
-      break;
-    case 12:
-      v = 4;
-      break;
-    case 13:
-      v = 5;
-      break;
-    case 14:
-      v = 6;
-      break;
-    case 15:
-      v = 7;
-      break;
-  }
-
+  v = x-7;
+    
   return {nota: f, volumen: v, id: userId};
 }

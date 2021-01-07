@@ -5,10 +5,10 @@ const socket = io.connect('http://localhost');
 let players = [];
 var x = 0;
 var y = 0;
-var mouseIsPressed;
+var dropsToAdd = [];
 var btnInstrumento1, btnInstrumento2,btnInstrumento3,btnInstrumento4,btnInstrumento5,btnInstrumento6;
 
-var actualQuadrant, lastQuadrant;
+var currentPosition, lastPosition;
 
 var instrumentsClient;
 
@@ -54,6 +54,8 @@ function setup() {
     socket.on("heartbeat", players => updatePlayers(players));
     socket.on("initializeInstruments", ins => setInstruments(ins));
     socket.on("play", s => playSounds(s));
+    socket.on("stop", pId => stopSounds(pId));
+    socket.on("press", p => addDrops(p));
     socket.on ("changedInstrument", data => changeInstrument(data));
     socket.on("showMessage",message => alert(message));
     socket.on("disconnect", playerId => removePlayer(playerId));
@@ -62,24 +64,27 @@ function setup() {
   Tone.Buffer.on('error', function() {
     alert("Sorry, there has been an error loading the samples. This demo works best on on the most up-to-date version of Chrome.");
   })
-}
-
-function draw() {
+  
   background(220,220,220,0);
   
-  btnInstrumento1.stroke();
-  btnInstrumento2.stroke();
-  btnInstrumento3.stroke();
-  btnInstrumento4.stroke();
-  btnInstrumento5.stroke();
-  btnInstrumento6.stroke(); 
-
+  stroke(230,230,230,40);
   for (let i=0; i<16; i++) {
     //vertical
     line(divisionAncho*i, HEIGHTMENU, divisionAncho*i, HEIGHT+HEIGHTMENU);
     //horizontal
     line(0, HEIGHTMENU+(divisionAlto*i), WIDTH,HEIGHTMENU+(divisionAlto*i));
   }
+  stroke(200);
+  btnInstrumento1.stroke();
+  btnInstrumento2.stroke();
+  btnInstrumento3.stroke();
+  btnInstrumento4.stroke();
+  btnInstrumento5.stroke();
+  btnInstrumento6.stroke();
+}
+
+function draw() {
+  
 }
 
 ////////////////////////////////////////////////////////////////// BUTTONS
@@ -108,19 +113,32 @@ Button.prototype.isMouseInside = function() {
 
 function playSounds(s) {
   player = getPlayer(s.id);
-  if(player != null){
-  vol.volume.value = s.volumen;
-  samples[player.instrument].triggerAttack(s.nota);
-  samples[player.instrument].triggerRelease(s.nota, "+0.8");
+  if(player != null && samples[player.instrument] !== undefined)
+  {
+    vol.volume.value = s.volumen;
+    samples[player.instrument].releaseAll();
+    samples[player.instrument].triggerAttack(s.nota);
   }
 }
 
-function changeSound(s) {
-  player = getPlayer(s.id);
-  samples[player.instrument].triggerAttack(s.nota);
-  samples[player.instrument].triggerRelease(s.nota, "+0.8");
+function stopSounds(pId) {
+  player = getPlayer(pId);
+  if(player != null && samples[player.instrument] !== undefined)
+  {
+    samples[player.instrument].releaseAll();
+  }
 }
 
+////////////////////////////////////////////////////////////////// RAIN LOGIC
+
+function addDrops(presses) {
+  
+  dropsToAdd = presses.map(p => {
+    return {x: WIDTH*0.02+p.x*WIDTH*0.95,
+            y: HEIGHT*0.02+p.y*HEIGHT*0.95}
+  });
+  
+}
 
 ////////////////////////////////////////////////////////////////// PLAYERS LOGIC
 
@@ -129,7 +147,8 @@ function updatePlayers(serverPlayers) {
     let playerFromServer = serverPlayers[i];
     if (!playerExists(playerFromServer)) {
       players.push(new Player(playerFromServer));
-      samples[playerFromServer.instrument].connect(vol);
+      if(samples[playerFromServer.instrument] !== undefined)
+        samples[playerFromServer.instrument].connect(vol);
     }
   }
 }
@@ -158,22 +177,24 @@ function getPlayer(id) {
 
 ////////////////////////////////////////////////////////////////// INSTRUMENTS
 
-function createInstruments(){
+function createInstruments() {
   socket.emit("getInstruments");
 }
 
-function setInstruments(i){
+function setInstruments(i) {
   this.instrumentsClient = i;
 }
 
-function sendChangeInstrument(newInstrument){
+function sendChangeInstrument(newInstrument) {
   socket.emit("changeInstrument", newInstrument);
 }
 
-function changeInstrument(data){
-  samples[data.lastInstrument].disconnect();
-  samples[data.newInstrument].connect(vol);
-  player.instrument = data.newInstrument;
+function changeInstrument(data) {
+  if(samples[data.lastInstrument] !== undefined)
+    samples[data.lastInstrument].disconnect();
+  if(samples[data.newInstrument] !== undefined)
+    samples[data.newInstrument].connect(vol);
+  getPlayer(data.id).instrument = data.newInstrument;
 }
 
 ////////////////////////////////////////////////////////////////// MOUSE EVENTS
@@ -185,31 +206,40 @@ function mousePressed() {
   if (btnInstrumento2.isMouseInside()) {
     sendChangeInstrument("xylophone");
   }
-  if(btnInstrumento3.isMouseInside()){
+  if(btnInstrumento3.isMouseInside()) {
     sendChangeInstrument("harp");
   }
-  if(btnInstrumento4.isMouseInside()){
+  if(btnInstrumento4.isMouseInside()) {
     sendChangeInstrument("guitar-acoustic");
   }
-  if(btnInstrumento5.isMouseInside()){
+  if(btnInstrumento5.isMouseInside()) {
     sendChangeInstrument("guitar-electric");
   }
-  if(btnInstrumento6.isMouseInside()){
+  if(btnInstrumento6.isMouseInside()) {
     sendChangeInstrument("cello");
   }
-  lastQuadrant = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
+  lastPosition = {x: mouseX*1.0/WIDTH, y: mouseY*1.0/HEIGHT};
+  var myClick = {x: mouseX*1.0/WIDTH, y: mouseY*1.0/HEIGHT, play: true};
+  
+  if(int(myClick.y*16) != 0) {
+    socket.emit('pressed',myClick);
+  }
+}
 
-  //Esto es para hacer música, cuando pongamos mejor la cuadrícula hay que quitarlo
-  var myClick = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
-  socket.emit('pressed',myClick);
+function mouseReleased() {
+  socket.emit('released');
 }
  
 function mouseDragged() {
-  actualQuadrant = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
-  console.log(actualQuadrant.y);
-
-  if (actualQuadrant.x-lastQuadrant.x != 0 || actualQuadrant.y-lastQuadrant.y != 0) {
-    socket.emit('pressed',actualQuadrant);
+  currentPosition = {x: mouseX*1.0/WIDTH, y: mouseY*1.0/HEIGHT, play: false};
+  if(int(currentPosition.y*16) != 0){
+    if (int(currentPosition.x*16)-int(lastPosition.x*16) != 0 ||
+        int(currentPosition.y*16)-int(lastPosition.y*16) != 0) {
+      currentPosition.play = true;
+    }
+    else
+      currentPosition.play = false;
+    lastPosition = {x: mouseX*1.0/WIDTH, y: mouseY*1.0/HEIGHT};
   }
-  lastQuadrant = {x: int((mouseX/WIDTH)*16), y: int((mouseY/HEIGHT)*16)};
+  socket.emit('pressed',currentPosition);
 }
