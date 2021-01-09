@@ -147,17 +147,20 @@ function addDrops(presses) {
 function updatePlayers(serverPlayers) {
   for (let i = 0; i < serverPlayers.length; i++) {
     let playerFromServer = serverPlayers[i];
-    if (!playerExists(playerFromServer)) {
+    if (!playerExists(playerFromServer) && !(players.length >= 2)) {
       players.push(new Player(playerFromServer));
       if(samples[playerFromServer.instrument] !== undefined)
         samples[playerFromServer.instrument].connect(vol);
     }
   }
+  if (players.length >= 2) {
+    $('.notAvailable').css('visibility', 'visible');
+  }
 }
 
 function playerExists(playerFromServer) {
   for (let i = 0; i < players.length; i++) {
-    if (players[i].id === playerFromServer) {
+    if (players[i].id === playerFromServer.id) {
       return true;
     }
   }
