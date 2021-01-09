@@ -45,12 +45,12 @@ io.sockets.on("connection", socket => {
   socket.on("changeInstrument",function(newIns){
     if(!isOccupied(newIns)){
       last = occupied[socket.id];
-      occupied[socket.id] =newIns;
+      occupied[socket.id] = newIns;
       p = getPlayer(socket.id);
       if(p !== null){
         p.instrument = newIns;
         dat = {id: socket.id, newInstrument: newIns, lastInstrument: last};
-        playersSockets[socket.id].emit("changedInstrument",dat);
+        io.sockets.emit("changedInstrument", dat);
       }
     }
     else{
@@ -82,16 +82,17 @@ function updateGame() {
 function getInstrumentForPlayer(id){
     for(i = 0; i<instruments.length;i++){
       ins = instruments[i];
+      console.log(instruments, i, ins);
       if(!isOccupied(ins)){
         occupied[id]=ins;
         return ins;
+    }
   }
-}
 }
 
 function isOccupied(instrument){
-  for(i in occupied){
-    if(occupied[i]===instrument){
+  for(var k in occupied){
+    if(occupied[k]===instrument){
       return true;
     }
   }

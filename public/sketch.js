@@ -1,6 +1,6 @@
 p5.disableFriendlyErrors = true;
 
-const socket = io.connect('http://localhost');
+const socket = io.connect('http://localhost'); // frajelly.raspberryip.com
 
 let players = [];
 var x = 0;
@@ -155,7 +155,7 @@ function updatePlayers(serverPlayers) {
 
 function playerExists(playerFromServer) {
   for (let i = 0; i < players.length; i++) {
-    if (players[i].id === playerFromServer) {
+    if (players[i].id === playerFromServer.id) {
       return true;
     }
   }
