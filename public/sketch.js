@@ -100,10 +100,15 @@ function Button(x,y,width,height,text){
 }
 
 Button.prototype.stroke=function(){
+  fill(230,230,230, 100);
+  stroke(230,230,230, 150);
   rect(this.x,this.y,this.width,this.height);
-  textSize(this.width/10); 
+  textSize(this.width/10);
   textAlign(CENTER, CENTER);
+  fill(20,20,20,180);
+  stroke(0,0,0,0);
   text(this.text, this.x, this.y, this.width, this.height);
+  stroke(230,230,230, 40);
 }
 
 Button.prototype.isMouseInside = function() {
