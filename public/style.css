@@ -32,7 +32,8 @@ canvas {
   top: 0px;
   width: 100%;
   height: 100%;
-  z-index: 9999;
-  background: url('img/pageLoader.gif') 50% 50% no-repeat rgb(249,249,249);
-  opacity: .8;
+  z-index: 500;
+  background: url('img/pageLoader.gif') 50% 50% no-repeat rgb(220,220,220);
+  background-size: 20%;
+  opacity: .6;
 }
