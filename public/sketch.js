@@ -3,6 +3,7 @@ p5.disableFriendlyErrors = true;
 const socket = io.connect('http://localhost'); // frajelly.raspberryip.com
 
 let players = [];
+var available = true;
 var x = 0;
 var y = 0;
 var dropsToAdd = [];
@@ -29,9 +30,9 @@ function setup() {
   createCanvas(WIDTH, HEIGHT+HEIGHTMENU);
   createInstruments();
 
-  btnInstrumento1=new Button(0,0,WIDTH/6,HEIGHTMENU,"Piano");
-  btnInstrumento2=new Button(WIDTH/6,0,WIDTH/6,HEIGHTMENU,"Xylophone");
-  btnInstrumento3=new Button((2*WIDTH)/6,0,WIDTH/6,HEIGHTMENU,"Harp");
+  btnInstrumento1 = new Button(0,0,WIDTH/6,HEIGHTMENU,"Piano");
+  btnInstrumento2 = new Button(WIDTH/6,0,WIDTH/6,HEIGHTMENU,"Xylophone");
+  btnInstrumento3 = new Button((2*WIDTH)/6,0,WIDTH/6,HEIGHTMENU,"Harp");
   btnInstrumento4 = new Button(((3*WIDTH)/6),0,WIDTH/6,HEIGHTMENU,"Acoustic Guitar");
   btnInstrumento5 = new Button(((4*WIDTH)/6),0,WIDTH/6,HEIGHTMENU,"Electric Guitar");
   btnInstrumento6 = new Button(WIDTH-(WIDTH/6),0,WIDTH/6,HEIGHTMENU,"Cello");
@@ -59,7 +60,8 @@ function setup() {
     socket.on("stop", pId => stopSounds(pId));
     socket.on("press", p => addDrops(p));
     socket.on ("changedInstrument", data => changeInstrument(data));
-    socket.on("showMessage",message => alert(message));
+    socket.on("showMessage", message => alert(message));
+    socket.on("eee", notAvailable());
     socket.on("disconnect", playerId => removePlayer(playerId));
 
   })
@@ -154,14 +156,11 @@ function addDrops(presses) {
 function updatePlayers(serverPlayers) {
   for (let i = 0; i < serverPlayers.length; i++) {
     let playerFromServer = serverPlayers[i];
-    if (!playerExists(playerFromServer) && !(players.length >= 2)) {
+    if (!playerExists(playerFromServer)) {
       players.push(new Player(playerFromServer));
       if(samples[playerFromServer.instrument] !== undefined)
         samples[playerFromServer.instrument].connect(vol);
     }
-  }
-  if (players.length >= 2) {
-    $('.notAvailable').css('visibility', 'visible');
   }
 }
 
@@ -185,6 +184,12 @@ function getPlayer(id) {
     }
   }
   return null;
+}
+
+function notAvailable() {
+  console.log("here");
+  $('.notAvailable').css('visibility', 'visible');
+  available = false;
 }
 
 ////////////////////////////////////////////////////////////////// INSTRUMENTS
@@ -212,46 +217,55 @@ function changeInstrument(data) {
 ////////////////////////////////////////////////////////////////// MOUSE EVENTS
 
 function mousePressed() {
-  if (btnInstrumento1.isMouseInside()) {
-    sendChangeInstrument("piano");
-  } 
-  if (btnInstrumento2.isMouseInside()) {
-    sendChangeInstrument("xylophone");
-  }
-  if(btnInstrumento3.isMouseInside()) {
-    sendChangeInstrument("harp");
-  }
-  if(btnInstrumento4.isMouseInside()) {
-    sendChangeInstrument("guitar-acoustic");
-  }
-  if(btnInstrumento5.isMouseInside()) {
-    sendChangeInstrument("guitar-electric");
-  }
-  if(btnInstrumento6.isMouseInside()) {
-    sendChangeInstrument("cello");
-  }
-  lastPosition = {x: mouseX*1.0/WIDTH, y: mouseY*1.0/HEIGHT};
-  var myClick = {x: mouseX*1.0/WIDTH, y: mouseY*1.0/HEIGHT, play: true};
-  
-  if(int(myClick.y*16) != 0) {
-    socket.emit('pressed',myClick);
+  if(available)
+  {
+    if (btnInstrumento1.isMouseInside()) {
+      sendChangeInstrument("piano");
+    } 
+    if (btnInstrumento2.isMouseInside()) {
+      sendChangeInstrument("xylophone");
+    }
+    if(btnInstrumento3.isMouseInside()) {
+      sendChangeInstrument("harp");
+    }
+    if(btnInstrumento4.isMouseInside()) {
+      sendChangeInstrument("guitar-acoustic");
+    }
+    if(btnInstrumento5.isMouseInside()) {
+      sendChangeInstrument("guitar-electric");
+    }
+    if(btnInstrumento6.isMouseInside()) {
+      sendChangeInstrument("cello");
+    }
+    lastPosition = {x: mouseX*1.0/WIDTH, y: mouseY*1.0/HEIGHT};
+    var myClick = {x: mouseX*1.0/WIDTH, y: mouseY*1.0/HEIGHT, play: true};
+    
+    if(int(myClick.y*16) != 0) {
+      socket.emit('pressed',myClick);
+    }
   }
 }
 
 function mouseReleased() {
-  socket.emit('released');
-}
- 
-function mouseDragged() {
-  currentPosition = {x: mouseX*1.0/WIDTH, y: mouseY*1.0/HEIGHT, play: false};
-  if(int(currentPosition.y*16) != 0){
-    if (int(currentPosition.x*16)-int(lastPosition.x*16) != 0 ||
-        int(currentPosition.y*16)-int(lastPosition.y*16) != 0) {
-      currentPosition.play = true;
-    }
-    else
-      currentPosition.play = false;
-    lastPosition = {x: mouseX*1.0/WIDTH, y: mouseY*1.0/HEIGHT};
+  if(available)
+  {
+    socket.emit('released');
   }
-  socket.emit('pressed',currentPosition);
+}
+
+function mouseDragged() {
+  if(available)
+  {
+    currentPosition = {x: mouseX*1.0/WIDTH, y: mouseY*1.0/HEIGHT, play: false};
+    if(int(currentPosition.y*16) != 0){
+      if (int(currentPosition.x*16)-int(lastPosition.x*16) != 0 ||
+          int(currentPosition.y*16)-int(lastPosition.y*16) != 0) {
+        currentPosition.play = true;
+      }
+      else
+        currentPosition.play = false;
+      lastPosition = {x: mouseX*1.0/WIDTH, y: mouseY*1.0/HEIGHT};
+    }
+    socket.emit('pressed',currentPosition);
+  }
 }

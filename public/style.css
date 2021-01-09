@@ -44,11 +44,11 @@ canvas {
   top: 0px;
   width: 100%;
   height: 100%;
-  z-index: 9999;
+  z-index: 1000;
   font-size: 150%;
   visibility: hidden;
   background: rgb(249,249,249);
-  opacity: .8;
+  opacity: .3;
   display: flex;
   justify-content: center;
   align-items: center;
