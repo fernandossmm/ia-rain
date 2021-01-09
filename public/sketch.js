@@ -101,7 +101,7 @@ function Button(x,y,width,height,text){
 
 Button.prototype.stroke=function(){
   rect(this.x,this.y,this.width,this.height);
-  textSize(this.width/10);
+  textSize(this.width/10); 
   textAlign(CENTER, CENTER);
   text(this.text, this.x, this.y, this.width, this.height);
 }
