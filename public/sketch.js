@@ -47,21 +47,23 @@ function setup() {
     instruments: instrumentsClient,
     baseUrl: "./samples/"
   })
+  
+  socket.on("notAvailable", (x) => {$('#notAvailable').css('visibility', 'visible');
+                              available = false;});
 
   Tone.Buffer.on('load', function() {
     NProgress.done();
 
     $(".loader").fadeOut("slow");
-
+    
     /// Client events
     socket.on("heartbeat", players => updatePlayers(players));
     socket.on("initializeInstruments", ins => setInstruments(ins));
     socket.on("play", s => playSounds(s));
     socket.on("stop", pId => stopSounds(pId));
     socket.on("press", p => addDrops(p));
-    socket.on ("changedInstrument", data => changeInstrument(data));
+    socket.on("changedInstrument", data => changeInstrument(data));
     socket.on("showMessage", message => alert(message));
-    socket.on("eee", notAvailable());
     socket.on("disconnect", playerId => removePlayer(playerId));
 
   })
@@ -184,12 +186,6 @@ function getPlayer(id) {
     }
   }
   return null;
-}
-
-function notAvailable() {
-  console.log("here");
-  $('.notAvailable').css('visibility', 'visible');
-  available = false;
 }
 
 ////////////////////////////////////////////////////////////////// INSTRUMENTS
