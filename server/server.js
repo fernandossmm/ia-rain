@@ -82,7 +82,6 @@ function updateGame() {
 function getInstrumentForPlayer(id){
     for(i = 0; i<instruments.length;i++){
       ins = instruments[i];
-      console.log(instruments, i, ins);
       if(!isOccupied(ins)){
         occupied[id]=ins;
         return ins;

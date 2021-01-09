@@ -17,7 +17,7 @@ const HEIGHTMENU = 50;
 const WIDTH = window.innerWidth;
 const HEIGHT = window.innerHeight - HEIGHTMENU;
 
-var divisionAncho =WIDTH/16;
+var divisionAncho = WIDTH/16;
 var divisionAlto = HEIGHT/16;
 
 function preload() {
@@ -136,8 +136,8 @@ function stopSounds(pId) {
 function addDrops(presses) {
   
   dropsToAdd = presses.map(p => {
-    return {x: WIDTH*0.02+p.x*WIDTH*0.95,
-            y: HEIGHT*0.02+p.y*HEIGHT*0.95}
+    return {dropX: WIDTH*0.02+p.x*WIDTH*0.95,
+            dropY: HEIGHT*0.02+p.y*HEIGHT*0.95}
   });
   
 }
