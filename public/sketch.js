@@ -1,6 +1,6 @@
 p5.disableFriendlyErrors = true;
 
-const socket = io.connect('http://localhost'); // frajelly.raspberryip.com
+var socket; // frajelly.raspberryip.com
 
 let players = [];
 var available = true;
@@ -28,6 +28,10 @@ var samples;
 
 function setup() {
   createCanvas(WIDTH, HEIGHT+HEIGHTMENU);
+  
+  socket = io.connect('http://localhost');
+  socket.on("eeee", (x) => notAvailable());
+  
   createInstruments();
 
   btnInstrumento1 = new Button(0,0,WIDTH/6,HEIGHTMENU,"Piano");
@@ -46,9 +50,6 @@ function setup() {
     instruments: instrumentsClient,
     baseUrl: "./samples/"
   })
-  
-  socket.on("notAvailable", (x) => {$("#notAvailable").css("visibility","visible");
-                              available = false;});
 
   Tone.Buffer.on('load', function() {
     
@@ -184,6 +185,12 @@ function getPlayer(id) {
     }
   }
   return null;
+}
+
+function notAvailable() {
+  console.log("here");
+  $("#notAvailable").css("visibility","visible");
+  available = false;
 }
 
 ////////////////////////////////////////////////////////////////// INSTRUMENTS

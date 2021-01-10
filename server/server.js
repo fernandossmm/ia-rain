@@ -71,7 +71,7 @@ io.sockets.on("connection", socket => {
   }
   else
   {
-    socket.emit("notAvailable", socket.id);
+    socket.emit("eeee", socket.id);
   }
 });
 
