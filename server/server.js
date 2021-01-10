@@ -1,6 +1,8 @@
 const express = require("express");
 const socket = require('socket.io');
 const app = express();
+const MAXPLAYERS = 4;
+
 let Player = require("./Player");
 
 let server = app.listen(80);
@@ -21,57 +23,60 @@ let currentlyPressed = [];
 setInterval(updateGame, 60);
 
 io.sockets.on("connection", socket => {
-  i = getInstrumentForPlayer(socket.id);
-  players.push(new Player(socket.id, i));
-  playersSockets[socket.id]=socket;
-  console.log(`New connection ${socket.id}`);
+  if(players.length < MAXPLAYERS)
+  {
+    i = getInstrumentForPlayer(socket.id);
+    players.push(new Player(socket.id, i));
+    playersSockets[socket.id]=socket;
+    console.log(`New connection ${socket.id}`);
 
-  socket.on('pressed', function (data) {
-      if(data.play)
-      {
-        sound = filterSound(data, socket.id);
-        io.sockets.emit("play",sound);
+    socket.on('pressed', function (data) {
+        if(data.play)
+        {
+          sound = filterSound(data, socket.id);
+          io.sockets.emit("play",sound);
+        }
+        
+        currentlyPressed[socket.id] = {x: data.x, y: data.y};
+    });
+    
+    socket.on('released', function (data) {
+        io.sockets.emit("stop",socket.id);
+        
+        delete currentlyPressed[socket.id];
+    });
+    
+    socket.on("changeInstrument",function(newIns){
+      if(!isOccupied(newIns)){
+        last = occupied[socket.id];
+        occupied[socket.id] = newIns;
+        p = getPlayer(socket.id);
+        if(p !== null){
+          p.instrument = newIns;
+          dat = {id: socket.id, newInstrument: newIns, lastInstrument: last};
+          io.sockets.emit("changedInstrument", dat);
+        }
       }
-      
-      currentlyPressed[socket.id] = {x: data.x, y: data.y};
-  });
-  
-  socket.on('released', function (data) {
-      io.sockets.emit("stop",socket.id);
-      
-      delete currentlyPressed[socket.id];
-  });
-  
-  socket.on("changeInstrument",function(newIns){
-    if(!isOccupied(newIns)){
-      last = occupied[socket.id];
-      occupied[socket.id] =newIns;
-      p = getPlayer(socket.id);
-      if(p !== null){
-        p.instrument = newIns;
-        dat = {id: socket.id, newInstrument: newIns, lastInstrument: last};
-        playersSockets[socket.id].emit("changedInstrument",dat);
+      else{
+        playersSockets[socket.id].emit("showMessage", "That instrument is being occupied"); //sólo se lo envía al usuario que quiso cambiar de instrumento
       }
-    }
-    else{
-      playersSockets[socket.id].emit("showMessage", "That instrument is being occupied"); //sólo se lo envía al usuario que quiso cambiar de instrumento
-    }
-  });
-  socket.on("disconnect", () => {
+    });
+    
+    socket.on("disconnect", reason => {
+      console.log("Closed connection "+ socket.id);
       io.sockets.emit("disconnect", socket.id);
       players = players.filter(player => player.id !== socket.id);
       occupied[socket.id] = "null";
-
-  });
-});
-
-io.sockets.on("disconnect", socket => {
-  io.sockets.emit("disconnect", socket.id);
-  players = players.filter(player => player.id !== socket.id);
-  occupied[socket.id] = "null";
+    });
+  }
+  else
+  {
+    socket.emit("eeee", socket.id);
+  }
 });
 
 function updateGame() {
+  
   io.sockets.emit("heartbeat", players);
   
   var p = Object.keys(currentlyPressed).map(x => currentlyPressed[x]);
@@ -85,13 +90,13 @@ function getInstrumentForPlayer(id){
       if(!isOccupied(ins)){
         occupied[id]=ins;
         return ins;
+    }
   }
-}
 }
 
 function isOccupied(instrument){
-  for(i in occupied){
-    if(occupied[i]===instrument){
+  for(var k in occupied){
+    if(occupied[k]===instrument){
       return true;
     }
   }
@@ -108,8 +113,8 @@ function getPlayer(id) {
 }
 
 function filterSound(sound, userId){
-  x = Math.round(sound.x*16);
-  y = Math.round(sound.y*16);
+  x = Math.max(0, Math.min(Math.round(sound.x*16), 16));
+  y = Math.max(0, Math.min(Math.round(sound.y*16), 16));
 
   var f, v;
   // TONO //
@@ -119,7 +124,7 @@ function filterSound(sound, userId){
   f = notas[(y)%notas.length]+""+(startingOctave-Math.floor(y/notas.length));
 
   // VOLUMEN //
-  v = x-7;
+  v = x-18;
     
   return {nota: f, volumen: v, id: userId};
 }

@@ -202,8 +202,8 @@ Raindrops.prototype={
           return Math.pow(n,3);
         });
         let rainDrop=this.createDrop({
-          x:press.x,
-          y:press.y,
+          x:press.dropX/this.scale,
+          y:press.dropY/this.scale,
           r:r,
           momentum:1+((r-this.options.minR)*0.1)+random(2),
           spreadX:1.5,
