@@ -113,8 +113,8 @@ function getPlayer(id) {
 }
 
 function filterSound(sound, userId){
-  x = Math.round(sound.x*16);
-  y = Math.round(sound.y*16);
+  x = Math.max(0, Math.min(Math.round(sound.x*16), 16));
+  y = Math.max(0, Math.min(Math.round(sound.y*16), 16));
 
   var f, v;
   // TONO //
@@ -124,7 +124,7 @@ function filterSound(sound, userId){
   f = notas[(y)%notas.length]+""+(startingOctave-Math.floor(y/notas.length));
 
   // VOLUMEN //
-  v = x-7;
+  v = x-18;
     
   return {nota: f, volumen: v, id: userId};
 }
