@@ -1,32 +1,27 @@
 html, body {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .background {
   visibility: hidden;
-  
   position: absolute;
   left: 0px;
-  up: 0px;
-  
   z-index: 0;
 }
 
 canvas {
-    display: block;
-    position: absolute;
-    left: 0px;
-    up: 0px;
-    
-    z-index: 150;
+  display: block;
+  position: absolute;
+  left: 0px;
+  z-index: 150;
 }
 
 #container {
   z-index: 100;
 }
 
-.loader {
+#loader {
   position: fixed;
   left: 0px;
   top: 0px;
@@ -53,5 +48,4 @@ canvas {
   display: flex;
   justify-content: center;
   align-items: center;
-  pointer-events:none;
 }

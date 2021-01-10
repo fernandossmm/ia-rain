@@ -41,20 +41,18 @@ function setup() {
   vol = new Tone.Volume().toMaster();
 
   //Instruments
-  NProgress.start();
 
   samples = SampleLibrary.load({
     instruments: instrumentsClient,
     baseUrl: "./samples/"
   })
   
-  socket.on("notAvailable", (x) => {$('#notAvailable').css('visibility', 'visible');
+  socket.on("notAvailable", (x) => {$("#notAvailable").css("visibility","visible");
                               available = false;});
 
   Tone.Buffer.on('load', function() {
-    NProgress.done();
-
-    $(".loader").fadeOut("slow");
+    
+    $("#loader").fadeOut("slow");
     
     /// Client events
     socket.on("heartbeat", players => updatePlayers(players));
