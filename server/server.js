@@ -113,8 +113,8 @@ function getPlayer(id) {
 }
 
 function filterSound(sound, userId){
-  x = Math.max(0, Math.min(Math.round(sound.x*16), 16));
-  y = Math.max(0, Math.min(Math.round(sound.y*16), 16));
+  x = Math.max(0, Math.min(Math.floor(sound.x*16), 16));
+  y = Math.max(0, Math.min(Math.floor(sound.y*16), 16));
 
   var f, v;
   // TONO //
